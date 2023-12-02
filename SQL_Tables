@@ -1,0 +1,45 @@
+CREATE DATABASE wonderlog;
+
+CREATE TABLE users (
+	name VARCHAR (20),
+	username VARCHAR (20),
+    password VARCHAR (20),
+    PRIMARY KEY(username)
+);
+
+CREATE TABLE cities( 
+	-- database from https://simplemaps.com/data/world-cities
+	city_id INT(10),
+    city_name VARCHAR(50),
+    latitude DECIMAL(8,6),
+    longitude DECIMAL(9,6),
+    country VARCHAR(50),
+    admin_name VARCHAR(50),
+    capital VARCHAR(7),
+    population INT(8),
+    constraint latitude_const check (latitude between -90 and 90),
+    constraint longitude_const check (longitude between -180 and 180),
+    constraint capital_constraint check (capital in ('primary', 'admin','minor')),
+    PRIMARY KEY(city_id)
+);
+
+CREATE TABLE visits (
+	username VARCHAR (20),
+	visit_number INT(6),	-- relative to each username
+    city_id INT(10),
+    start_date DATE,
+    end_date DATE,
+    notes VARCHAR (10000),
+    foreign key(username) references users(username),
+    foreign key(city_id) references cities(city_id)
+);
+
+CREATE TABLE activities (
+    username VARCHAR (20),
+    visit_number INT(6),
+	activity_number INT(3),	-- relative to each visit
+    day DATE,
+    location VARCHAR (100),
+    description VARCHAR (10000),
+    foreign key(username) references users(username)
+);
