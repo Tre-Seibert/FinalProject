@@ -1,0 +1,4 @@
+/* Keeps the container width to our custom width */
+.cover-container {
+  max-width: 50em;
+}
