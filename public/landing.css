@@ -1,0 +1,11 @@
+
+/* For the login button */
+.btn-secondary,
+.btn-secondary:hover {
+  color: #333;
+  text-shadow: none; 
+}
+/* Keeps the container width to our custom width */
+.cover-container {
+  max-width: 50em;
+}
