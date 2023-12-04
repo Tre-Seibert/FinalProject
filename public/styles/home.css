@@ -1,4 +1,23 @@
+/* For the add location button */
+.btn-secondary,
+.btn-secondary:hover {
+  color: #333;
+  text-shadow: none; 
+}
 /* Keeps the container width to our custom width */
 .cover-container {
   max-width: 50em;
+}
+
+/* Styles for the form to add a new travel experience*/
+.city-entry-form {
+  display: none;
+  background-color: rgba(34, 37, 41, 0.1);
+  padding: 20px;
+  border-radius: 8px;
+}
+
+/* Styles for the label of the form to add a new travel experience*/
+.city-entry-form label {
+  font-weight: bold;
 }
