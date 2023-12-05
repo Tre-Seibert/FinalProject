@@ -35,17 +35,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Access the path elements inside the SVG
             visitedCountries.forEach(code => {
+               
                 const path = svgDoc.getElementById(code);
+                
                 console.log("Country Code:", code);
                 console.log("Path Element:", path);
 
                 if (path !== null) {
                     path.style.fill = 'white'; // Set the fill color to white
-                } else {
+                } 
+                else {
                     console.warn(`Path with ID ${code} not found.`);
                 }
             });
-        } else {
+        } 
+        else {
             console.warn("SVG Document not available");
         }
     });
