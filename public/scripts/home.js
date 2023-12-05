@@ -78,17 +78,19 @@ function displayCountryModal(countryId) {
     
     // Static for now... get trip information here from mysql
     let countryInfo = {
-        name: 'Country Name', 
-        capital: 'Capital',
-        population: 'Population',
+        name: 'United States',
+        capital: 'Washington, D.C.',
+        population: '331 million',
+        attractions: ['Statue of Liberty', 'Grand Canyon', 'Disney World'],
     };
+    
 
     // Update modal content with country information
     let modalTitle = document.getElementById('countryModalLabel');
     let modalBody = document.getElementById('countryInfo');
 
     // Populate the modal
-    modalTitle.innerText = `Country Information - ${countryInfo.name}`;
+    modalTitle.innerText = `Your Trip to ${countryInfo.name} at a Glance`;
     modalBody.innerHTML = `
         <p>Capital: ${countryInfo.capital}</p>
         <p>Population: ${countryInfo.population}</p>

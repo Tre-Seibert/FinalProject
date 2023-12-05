@@ -23,7 +23,16 @@
 .city-entry-form label {
   font-weight: bold;
 }
-
+/* Style to make map gui responsive */
 .svg-container {
   max-width: 100%;
+}
+
+/* Style to make modal body text black*/
+#countryModal .modal-body {
+  color: black;
+}
+
+#countryModal .modal-title {
+  color: black;
 }
