@@ -4,10 +4,12 @@
   color: #333;
   text-shadow: none; 
 }
+
 /* Keeps the container width to our custom width */
 .cover-container {
   max-width: 50em;
 }
+
 
 /* Styles for the form to add a new travel experience*/
 .city-entry-form {
