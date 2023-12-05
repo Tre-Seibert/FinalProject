@@ -30,16 +30,16 @@
             <main class="px-3">
 
                 <!-- Login Form -->
-                <form>
+                <form name="login" action="http://localhost:3000/login" method="post">
                     <h3 class="mb-3">Welcome Back!</h3>
                     <div class="mb-3 row justify-content-center">
                         <div class="col-sm-4">
-                            <input type="text" class="form-control" id="loginUsername" placeholder="Username" required>
+                            <input type="text" class="form-control" name="usr" id="loginUsername" placeholder="Username" required>
                         </div>
                     </div>
                     <div class="mb-3 row justify-content-center">
                         <div class="col-sm-4">
-                            <input type="password" class="form-control" id="loginPassword" placeholder="Password" required>
+                            <input type="password" class="form-control" name="pwd" id="loginPassword" placeholder="Password" required>
                         </div>
                     </div>
                     <button type="submit" class="btn btn-md btn-secondary fw-bold border-white bg-white">Login</button>
@@ -48,21 +48,21 @@
                 <hr class="my-4">
             
                 <!-- Sign Up Form -->
-                <form>
+                <form name="register" action="http://localhost:3000/login" method="post">
                     <h3 class="mb-3">New to WanderLog?</h3>
                     <div class="mb-3 row justify-content-center">
                         <div class="col-sm-4">
-                            <input type="text" class="form-control" id="signupName" placeholder="Name" required>
+                            <input type="text" class="form-control" name="name" id="signupName" placeholder="Name" required>
                         </div>
                     </div>
                     <div class="mb-3 row justify-content-center">
                         <div class="col-sm-4">
-                            <input type="text" class="form-control" id="signupUsername" placeholder="Username" required>
+                            <input type="text" class="form-control" name="usr" id="signupUsername" placeholder="Username" required>
                         </div>
                     </div>
                     <div class="mb-3 row justify-content-center">
                         <div class="col-sm-4">
-                            <input type="password" class="form-control" id="signupPassword" placeholder="Password" required>
+                            <input type="password" class="form-control" name="pwd" id="signupPassword" placeholder="Password" required>
                         </div>
                     </div>
                     <button type="submit" class="btn btn-md btn-secondary fw-bold border-white bg-white">Sign Up</button>
