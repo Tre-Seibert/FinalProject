@@ -27,7 +27,7 @@
         <div class="cover-container d-flex w-100 p-3 mx-auto flex-column">
             <header>
                 <div class="container-sm">
-                    <a href="/" class="text-decoration-none text-white">
+                    <a href="/home" class="text-decoration-none text-white">
                         <h3 class="float-md-start mb-0">WanderLog</h3>
                     </a>
                 </div>
@@ -47,16 +47,16 @@
 
                 <!-- User Stats -->
                 <div class="user-stats">
-                    <h3>Your Travel Statistics:</h3>
-                    <p class="mt-3">Total Cities Visited: <span id="totalCities">0</span></p>
-                    <p>Countries Explored: <span id="countriesExplored">0</span></p>
-                    <p>Cumulative Distance Traveled: <span id="cumulativeDistance">0</span> miles</p>
+                    <h3>Your Wander Statistics:</h3>
+                    <p class="mt-3">Total Cities Wandered: <span id="totalCities">0</span></p>
+                    <p>Countries Wandered: <span id="countriesExplored">0</span></p>
+                    <p>Cumulative Distance Wandered: <span id="cumulativeDistance">0</span> miles</p>
                 </div>
                 
                 <!-- Add a City -->
-                <h3 class="mt-5">New Travel Experience?</h3>
-                <p>Add it to your journal here...</p>
-               
+                <h3 class="mt-5">Wander Somewhere New?</h3>
+                <!-- <p>Add it to your journal here...</p> -->
+                
                 <!-- Entry Form -->
                 <div class="city-entry-form mt-5 " id="cityEntryForm">
 
@@ -67,33 +67,52 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="country" class="form-label">Country:</label>
-                            <input type="text" class="form-control" id="country" name="country" placeholder="France" required>
-                        </div>
-
-                        <div class="mb-3">
                             <label for="deparetureDate" class="form-label">Departure Date:</label>
                             <input type="date" class="form-control" id="deparetureDate" name="deparetureDate" required>
                         </div>
-
 
                         <div class="mb-3">
                             <label for="returnDate" class="form-label">Return Date:</label>
                             <input type="date" class="form-control" id="returnDate" name="returnDate" required>
                         </div>
+                        
 
                         <div class="mb-3">
                             <label for="notes" class="form-label">Notes:</label>
                             <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="My favorite exercusion in paris was the Effiel Tower..." required></textarea>
+                            <!-- Button to add check in's -->
+                            <button type="button" class="btn btn-sm btn-secondary fw-bold border-white bg-white mt-3 mb-3" onclick="toggleCheckInForm()">Add Check-In</button>
+                        </div>
+                        
+
+
+                        <!-- Check-in Fields -->
+                        <div id="checkInFields" style="display: none;">
+                            <div class="mb-3">
+                                <label for="location" class="form-label">Location:</label>
+                                <input type="text" class="form-control" id="location" name="location"
+                                    placeholder="E.g., Hotel, Restaurant, Landmark">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="checkInDate" class="form-label">Check-In Date:</label>
+                                <input type="date" class="form-control" id="checkInDate" name="checkInDate">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description:</label>
+                                <textarea class="form-control" id="description" name="description" rows="3"
+                                    placeholder="Additional details about your check-in"></textarea>
+                            </div>
                         </div>
 
                         <!-- Submit button -->
-                        <button type="submit" class="btn btn-md btn-secondary fw-bold border-white bg-white mt-3 mb-5">Submit</button>
+                        <button type="submit" class="btn btn-lg btn-secondary fw-bold border-white bg-white mt-3 mb-5">Submit</button>
                     </form>
                 </div>
                 
                 <!-- Toggle button -->
-                <button class="btn btn-md btn-secondary fw-bold border-white bg-white mt-3 mb-5" onclick="toggleForm()">Add New Location</button>
+                <button class="btn btn-lg btn-secondary fw-bold border-white bg-white mt-3 mb-5" onclick="toggleForm()">Add New Location</button>
 
             </main>
 

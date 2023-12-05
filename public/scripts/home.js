@@ -16,8 +16,20 @@ function toggleForm() {
     }
 }
 
+// Function to toggle check in form on click
+function toggleCheckInForm() {
+    // Toggle the display of checkInFields fields
+    var checkInFields = document.getElementById('checkInFields');
+    checkInFields.style.display = checkInFields.style.display === 'none' ? 'block' : 'none';
+}
+
+// We'll need a function here to retrieve and post info from form when submit button is clicked to sql db
+// function newCityEntry() ...
+
+// STATIC retrieve all countries ...
 const visitedCountries = ["US", "QA", "ID", "JM", "IT"];
 
+// Fills countries white if visited
 document.addEventListener("DOMContentLoaded", function () {
     console.log("DOM LOADED");
 
