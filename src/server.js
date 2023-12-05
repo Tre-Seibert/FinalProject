@@ -58,16 +58,13 @@ app.post('/login', (req, res) => {
     var pwd = req.body.pwd;
 
     if(name) {
-
         var sql_query_register = "INSERT INTO users (name, username, password) VALUES ('" + name + "', '" + usr + "', '" + pwd + "');"
 
         con.query(sql_query_register, function (err, result, fields) { // execute the SQL string
             if (err)
                 res.send("Illegal Query" + err);                  // SQL error
-        
             else {
                         console.log(sql_query_register);          // send query results to the console
-        
                         res.redirect("http://localhost:3000/home?usr=" + usr);   // redirect to home
                 }
         });
@@ -79,16 +76,12 @@ app.post('/login', (req, res) => {
         con.query(sql_query_login, function (err, result, fields) { // execute the SQL string
             if (err)
                 res.send("Illegal Query" + err);                  // SQL error
-        
             else if (result[0]) {
                 console.log(sql_query_login);                     // send query results to the console
-
                 res.redirect("http://localhost:3000/home?usr=" + usr);   // redirect to home
             }
-                
             else 
                 res.send("No Account");                //no account
-
         });
     }
 });
