@@ -4,20 +4,27 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        
         <title>WanderLog: The Traveler's Journal</title>
         
+        <!-- Favicon -->
         <link rel="icon" type="image/x-icon" href="images/travel.ico">
+       
+        <!-- BootStrap CSS Libraries -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
         
+        <!-- External CSS File -->
         <link href="styles/home.css" rel="stylesheet">
 
     </head>
 
+    <!-- Body -->
     <body class="d-flex flex-column h-100 text-center text-white bg-dark">
 
-        <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
-            <header class="mb-auto">
-                <div>
+        <!-- Title Header -->
+        <div class="cover-container d-flex w-100 p-3 mx-auto flex-column">
+            <header>
+                <div class="container-sm">
                     <a href="/" class="text-decoration-none text-white">
                         <h3 class="float-md-start mb-0">WanderLog</h3>
                     </a>
@@ -25,11 +32,14 @@
             </header>
         </div>
 
-
-        <div class="map-cover d-flex justify-content-center">
-            <object id="world-map" class="svg-object object-fit-sm-fill" type="image/svg+xml" data="images/world.svg"></object>
+        <!-- MAP GUI -->
+        <div class="container">
+            <div class="svg-container">
+                <object id="world-map" class="img-fluid" type="image/svg+xml" data="images/world.svg"></object>
+            </div>
         </div>
 
+        <!-- Main Body -->
         <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
             <main class="px-3">
 
@@ -41,8 +51,10 @@
                     <p>Cumulative Distance Traveled: <span id="cumulativeDistance">0</span> miles</p>
                 </div>
                 
+                <!-- Add a City -->
                 <h3 class="mt-5">New Travel Experience?</h3>
                 <p>Add it to your journal here...</p>
+               
                 <!-- Entry Form -->
                 <div class="city-entry-form mt-5" id="cityEntryForm">
 
@@ -67,20 +79,23 @@
                             <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="My favorite exercusion in paris was the Effiel Tower..." required></textarea>
                         </div>
 
+                        <!-- Submit button -->
                         <button type="submit" class="btn btn-md btn-secondary fw-bold border-white bg-white mt-3 mb-5">Submit</button>
                     </form>
                 </div>
-
+                
+                <!-- Toggle button -->
                 <button class="btn btn-md btn-secondary fw-bold border-white bg-white mt-3 mb-5" onclick="toggleForm()">Add New Location</button>
 
             </main>
 
-
+            <!-- Footer -->
             <footer class="mt-auto text-white-50">
                 <p class="text-white">&copy; 2023 - Tre Seibert - Joseph Popp</p>
             </footer>
         </div>
 
+        <!-- Scripts - * Load Boostrap libraries last * -->
         <script src="scripts/home.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     </body>

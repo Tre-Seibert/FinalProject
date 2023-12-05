@@ -23,3 +23,7 @@
 .city-entry-form label {
   font-weight: bold;
 }
+
+.svg-container {
+  max-width: 100%;
+}
