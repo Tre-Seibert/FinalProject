@@ -103,7 +103,7 @@ app.post('/login', (req, res) => {
                 res.cookie('username', usr); 
                 
                 // redirect back home 
-                res.redirect(`http://localhost:3000/home`);
+                res.redirect(`http://localhost:3000/home?usr=${usr}`);
             }
         });
     } 
