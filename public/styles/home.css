@@ -33,6 +33,12 @@
   color: black;
 }
 
+/* Style to make modal title black */
 #countryModal .modal-title {
   color: black;
+}
+
+.centered {
+  display: block;
+  margin: 0 auto;
 }

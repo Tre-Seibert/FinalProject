@@ -1,59 +1,131 @@
+// ************************
+//      GLOBALS
+// ************************
+
+let username;
+
+// ************************
+//      FUNCTIONS
+// ************************
+
 // Function to toggle new experience form on click
 function toggleForm() {
-    // Get the form element by its ID
+    // get the form element by its ID
     var form = document.getElementById("cityEntryForm");
 
-    // Get the computed style of the form's display property
+    // get the style of the form's display property
     var formDisplayStyle = window.getComputedStyle(form).getPropertyValue('display');
 
-    // Check if the form is currently hidden or not set (initial state)
+    // check if the form is currently hidden or not set (initial state)
     if (formDisplayStyle === 'none' || formDisplayStyle === '') {
-        // If hidden or not set, display the form
+        // if hidden or not set, display the form
         form.style.display = 'block';
-    } else {
-        // If visible, hide the form
+        // toggle button visibility
+        document.getElementById("addLocationBtn").style.display = 'none';
+        document.getElementById("closeFormBtn").style.display = 'block';
+    } 
+    else {
+        // if visible then hide the form
         form.style.display = 'none';
+        // toggle button visibility
+        document.getElementById("addLocationBtn").style.display = 'block';
+        document.getElementById("closeFormBtn").style.display = 'none';
     }
 }
 
-// Function to toggle check in form on click
-function toggleCheckInForm() {
-    // Toggle the display of checkInFields fields
-    var checkInFields = document.getElementById('checkInFields');
-    checkInFields.style.display = checkInFields.style.display === 'none' ? 'block' : 'none';
+// Function to close the form and show the "Add New Location" button
+function closeForm() {
+    var form = document.getElementById("cityEntryForm");
+    form.style.display = 'none';
+    // toggle button visibility
+    document.getElementById("addLocationBtn").style.display = 'block';
+    document.getElementById("closeFormBtn").style.display = 'none';
 }
 
-// We'll need a function here to retrieve and post info from form when submit button is clicked to sql db
-// function newCityEntry() ...
+// Function to display country modal
+function displayCountryModal(countryId, countryName) {
+    
+    // static for now... get trip information here from mysql
+    // dynamically get a list of cities and their associated information
+    let countryInfo = {
+        name: 'United States',
+        capital: 'Washington, D.C.',
+        population: '331 million',
+        attractions: ['Statue of Liberty', 'Grand Canyon', 'Disney World'],
+    };
+    
 
-// STATIC retrieve all countries ...
+    // update modal content with country information
+    let modalTitle = document.getElementById('countryModalLabel');
+    let modalBody = document.getElementById('countryInfo');
+
+    // populate the modal
+    modalTitle.innerText = `${username}'s Trips to ${countryName} at a Glance`;
+    modalBody.innerHTML = `
+        <p>Capital: ${countryInfo.capital}</p>
+        <p>Population: ${countryInfo.population}</p>
+        <!-- Add more information as needed -->
+    `;
+
+    // display the modal
+    let countryModal = new bootstrap.Modal(document.getElementById('countryModal'));
+    countryModal.show();
+}
+
+// *******************************
+//   EVENT LISTENER FUNCTIONS
+// *******************************
+
+// Function to get the currently logged in username
+document.addEventListener('DOMContentLoaded', function () {
+    
+    // get the username from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    username = urlParams.get('usr');
+
+    console.log('Username:', username);
+
+    // update username tag in home.html
+    const usernameElement = document.getElementById('username');
+    if (usernameElement) {
+        usernameElement.innerText = username;
+    }
+});
+
+// static retrieve all countries ... we can turn this into a function to get all visited countries
 const visitedCountries = ["US", "QA", "ID", "JM", "IT"];
 
-// Fills countries white if visited
+// function that fills countries white if visited
 document.addEventListener("DOMContentLoaded", function () {
     console.log("DOM LOADED");
 
-    // Wait for the SVG image to load
+    // wait for the SVG image to fully load
     const worldMapObject = document.getElementById("world-map");
-
+    
     worldMapObject.addEventListener("load", function () {
-        // Access the SVG contentDocument
+        
+        // access world.svg
         const svgDoc = worldMapObject.contentDocument;
 
-        // Check if the SVG document is available
         if (svgDoc) {
             console.log("SVG Document is available");
 
-            // Access the path elements inside the SVG
+            // dynamically get list of visitedCountries - use username global variable
+            // visitedCountries = select * countries where username ...
+
+            // loop through the paths in the svg
             visitedCountries.forEach(code => {
                
+                // find the country using the id in world.svg
                 const path = svgDoc.getElementById(code);
                 
                 console.log("Country Code:", code);
                 console.log("Path Element:", path);
 
+                // if the countryid is in world.svg 
                 if (path !== null) {
-                    path.style.fill = 'white'; // Set the fill color to white
+                    // fill the country white
+                    path.style.fill = 'white';
                 } 
                 else {
                     console.warn(`Path with ID ${code} not found.`);
@@ -67,225 +139,36 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-// Function to get ID of country clicked
+// Function to get ID and Name of country clicked and display modal if visited
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('world-map').addEventListener('load', function () {
-        // Add click event listener to the loaded SVG
+        
+        // waits for DOM to load
+        // wait for svg to load
+
+        // access world.svg
         let svgDoc = document.getElementById('world-map').contentDocument;
+        // select all paths
         let paths = svgDoc.querySelectorAll('path');
+        
+        // listen for a click for each 'path'(country) in world.svg
         paths.forEach(function (path) {
             path.addEventListener('click', function () {
-                // Check if the clicked country is in the visitedCountries list
+                
+                // get the country id and name
                 let clickedCountryId = path.id;
+                let clickedCountryName = path.getAttribute('title');
+
+                console.log("Country Code:", clickedCountryId);
+                console.log("Country Name:", clickedCountryName);
+
+                // check if the clicked country is in the visitedCountries list
                 if (visitedCountries.includes(clickedCountryId)) {
-                    // Display modal with country information
-                    displayCountryModal(clickedCountryId);
+                    // display modal with country information
+                    displayCountryModal(clickedCountryId, clickedCountryName);
                 }
             });
         });
     });
 });
 
-function displayCountryModal(countryId) {
-    
-    // Static for now... get trip information here from mysql
-    let countryInfo = {
-        name: 'United States',
-        capital: 'Washington, D.C.',
-        population: '331 million',
-        attractions: ['Statue of Liberty', 'Grand Canyon', 'Disney World'],
-    };
-    
-
-    // Update modal content with country information
-    let modalTitle = document.getElementById('countryModalLabel');
-    let modalBody = document.getElementById('countryInfo');
-
-    // Populate the modal
-    modalTitle.innerText = `Your Trip to ${countryInfo.name} at a Glance`;
-    modalBody.innerHTML = `
-        <p>Capital: ${countryInfo.capital}</p>
-        <p>Population: ${countryInfo.population}</p>
-        <!-- Add more information as needed -->
-    `;
-
-    // Show the modal
-    let countryModal = new bootstrap.Modal(document.getElementById('countryModal'));
-    countryModal.show();
-}
-
-
-
-
-
-// countries = {
-//     "AF": "Afghanistan", 
-//      "AL": "Albania", 
-//      "DZ": "Algeria", 
-//      "AI": "Anguilla", 
-//      "AM": "Armenia", 
-//      "AW": "Aruba", 
-//      "AT": "Austria", 
-//      "BH": "Bahrain", 
-//      "BD": "Bangladesh", 
-//      "BB": "Barbados", 
-//      "BY": "Belarus", 
-//      "BE": "Belgium", 
-//      "BZ": "Belize", 
-//      "BJ": "Benin", 
-//      "BM": "Bermuda", 
-//      "BT": "Bhutan", 
-//      "BO": "Bolivia", 
-//      "BA": "Bosnia and Herzegovina", 
-//      "BW": "Botswana", 
-//      "BR": "Brazil", 
-//      "VG": "British Virgin Islands", 
-//      "BN": "Brunei Darussalam", 
-//      "BG": "Bulgaria", 
-//      "BF": "Burkina Faso", 
-//      "BI": "Burundi", 
-//      "KH": "Cambodia", 
-//      "CM": "Cameroon", 
-//      "CF": "Central African Republic", 
-//      "TD": "Chad", 
-//      "CO": "Colombia", 
-//      "CR": "Costa Rica", 
-//      "HR": "Croatia", 
-//      "CU": "Cuba", 
-//      "CW": "Curaçao", 
-//      "CZ": "Czech Republic", 
-//      "CI": "Côte d'Ivoire", 
-//      "KP": "Dem. Rep. Korea", 
-//      "CD": "Democratic Republic of the Congo", 
-//      "DJ": "Djibouti", 
-//      "DM": "Dominica", 
-//      "DO": "Dominican Republic", 
-//      "EC": "Ecuador", 
-//      "EG": "Egypt", 
-//      "SV": "El Salvador", 
-//      "GQ": "Equatorial Guinea", 
-//      "ER": "Eritrea", 
-//      "EE": "Estonia", 
-//      "ET": "Ethiopia", 
-//      "FI": "Finland", 
-//      "GF": "French Guiana", 
-//      "GA": "Gabon", 
-//      "GE": "Georgia", 
-//      "DE": "Germany", 
-//      "GH": "Ghana", 
-//      "GL": "Greenland", 
-//      "GD": "Grenada", 
-//      "GU": "Guam", 
-//      "GT": "Guatemala", 
-//      "GN": "Guinea", 
-//      "GW": "Guinea-Bissau", 
-//      "GY": "Guyana", 
-//      "HT": "Haiti", 
-//      "HN": "Honduras", 
-//      "HU": "Hungary", 
-//      "IS": "Iceland", 
-//      "IN": "India", 
-//      "IR": "Iran", 
-//      "IQ": "Iraq", 
-//      "IE": "Ireland", 
-//      "IL": "Israel", 
-//      "JM": "Jamaica", 
-//      "JO": "Jordan", 
-//      "KZ": "Kazakhstan", 
-//      "KE": "Kenya", 
-//      "XK": "Kosovo", 
-//      "KW": "Kuwait", 
-//      "KG": "Kyrgyzstan", 
-//      "LA": "Lao PDR", 
-//      "LV": "Latvia", 
-//      "LB": "Lebanon", 
-//      "LS": "Lesotho", 
-//      "LR": "Liberia", 
-//      "LY": "Libya", 
-//      "LT": "Lithuania", 
-//      "LU": "Luxembourg", 
-//      "MK": "Macedonia", 
-//      "MG": "Madagascar", 
-//      "MW": "Malawi", 
-//      "MV": "Maldives", 
-//      "ML": "Mali", 
-//      "MH": "Marshall Islands", 
-//      "MQ": "Martinique", 
-//      "MR": "Mauritania", 
-//      "YT": "Mayotte", 
-//      "MX": "Mexico", 
-//      "MD": "Moldova", 
-//      "MN": "Mongolia", 
-//      "ME": "Montenegro", 
-//      "MS": "Montserrat", 
-//      "MA": "Morocco", 
-//      "MZ": "Mozambique", 
-//      "MM": "Myanmar", 
-//      "NA": "Namibia", 
-//      "NR": "Nauru", 
-//      "NP": "Nepal", 
-//      "NL": "Netherlands", 
-//      "BQBO": "Netherlands", 
-//      "NI": "Nicaragua", 
-//      "NE": "Niger", 
-//      "NG": "Nigeria", 
-//      "PK": "Pakistan", 
-//      "PW": "Palau", 
-//      "PS": "Palestine", 
-//      "PA": "Panama", 
-//      "PY": "Paraguay", 
-//      "PE": "Peru", 
-//      "PL": "Poland", 
-//      "PT": "Portugal", 
-//      "QA": "Qatar", 
-//      "CG": "Republic of Congo", 
-//      "KR": "Republic of Korea", 
-//      "RE": "Reunion", 
-//      "RO": "Romania", 
-//      "RW": "Rwanda", 
-//      "BQSA": "Saba (Netherlands)", 
-//      "LC": "Saint Lucia", 
-//      "VC": "Saint Vincent and the Grenadines", 
-//      "BL": "Saint-Barthélemy", 
-//      "MF": "Saint-Martin", 
-//      "SA": "Saudi Arabia", 
-//      "SN": "Senegal", 
-//      "RS": "Serbia", 
-//      "SL": "Sierra Leone", 
-//      "SX": "Sint Maarten", 
-//      "SK": "Slovakia", 
-//      "SI": "Slovenia", 
-//      "SO": "Somalia", 
-//      "ZA": "South Africa", 
-//      "SS": "South Sudan", 
-//      "ES": "Spain", 
-//      "LK": "Sri Lanka", 
-//      "BQSE": "St. Eustatius (Netherlands)", 
-//      "SD": "Sudan", 
-//      "SR": "Suriname", 
-//      "SZ": "Swaziland", 
-//      "SE": "Sweden", 
-//      "CH": "Switzerland", 
-//      "SY": "Syria", 
-//      "TW": "Taiwan", 
-//      "TJ": "Tajikistan", 
-//      "TZ": "Tanzania", 
-//      "TH": "Thailand", 
-//      "GM": "The Gambia", 
-//      "TL": "Timor-Leste", 
-//      "TG": "Togo", 
-//      "TN": "Tunisia", 
-//      "TM": "Turkmenistan", 
-//      "TV": "Tuvalu", 
-//      "UG": "Uganda", 
-//      "UA": "Ukraine", 
-//      "AE": "United Arab Emirates", 
-//      "UY": "Uruguay", 
-//      "UZ": "Uzbekistan", 
-//      "VE": "Venezuela", 
-//      "VN": "Vietnam", 
-//      "EH": "Western Sahara", 
-//      "YE": "Yemen", 
-//      "ZM": "Zambia", 
-//      "ZW": "Zimbabwe"
-//    }
