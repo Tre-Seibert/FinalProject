@@ -79,7 +79,8 @@ app.get('/', (req, res) => {
 });
 
 //---------------------------------------------------------------------------
-
+// Handles post during login
+//---------------------------------------------------------------------------
 app.post('/login', (req, res) => {
     const name = req.body.name;
     const usr = req.body.usr;
@@ -137,7 +138,8 @@ app.post('/login', (req, res) => {
 
 
 //---------------------------------------------------------------------------
-
+// Hanldes post during travel experience form submission
+//---------------------------------------------------------------------------
 app.post('/home', (req, res) => {
     
     // extract data from the form submission
@@ -180,3 +182,30 @@ app.post('/home', (req, res) => {
 
 
 //app.get('/home', (req, res) => {});
+
+//---------------------------------------------------------------------------
+// Hanldes get during world.csg loading
+//---------------------------------------------------------------------------
+// Add this route to handle fetching visited countries
+app.get('/visited-countries', (req, res) => {
+    // Get the username from cookies
+    const username = req.cookies.username;
+
+    if (!username) {
+        res.status(401).json({ error: 'Unauthorized' });
+        return;
+    }
+
+    // Query the database to get visited countries for the user
+    const sqlQuery = 'SELECT DISTINCT country FROM visits WHERE username = ?';
+
+    con.query(sqlQuery, [username], (err, result) => {
+        if (err) {
+            console.error('Error fetching visited countries:', err);
+            res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+            const visitedCountries = result.map(row => row.country);
+            res.json({ visitedCountries });
+        }
+    });
+});
