@@ -7,6 +7,10 @@ app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });
 
+// Cookie parser for storing creds
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
 //*** create form parser
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -14,28 +18,28 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // This sql connection works for joe. Joe use this when working
 
 //*** set up mysql connections
- var mysql = require('mysql');
+//  var mysql = require('mysql');
 
 
- var con = mysql.createConnection({
-     host: "localhost",
-     user: "root",
-     password: "blubbins",  // use your own MySQL root password
-     database: "wanderlog"
-   });
+//  var con = mysql.createConnection({
+//      host: "localhost",
+//      user: "root",
+//      password: "blubbins",  // use your own MySQL root password
+//      database: "wanderlog"
+//    });
 
 
 // This sql connection works for Tre. Tre use this when working
 
-//var mysql = require('mysql2');
+var mysql = require('mysql2');
 
-//var con = mysql.createConnection({
-//  host: "localhost",
-//port: "3306",
-//  user: "root",
-//  password: "Alexemma1",
-//  database: "WanderLog"
-//});
+var con = mysql.createConnection({
+ host: "localhost",
+port: "3306",
+ user: "root",
+ password: "Alexemma1",
+ database: "WanderLog"
+});
 
 //*** connect to the database
 con.connect(function(err) {
@@ -51,6 +55,16 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 // Serve home.html when /home is accessed
 app.get('/home', (req, res) => {
+
+    // get username from cookies
+    const username = req.cookies.username;
+
+    // handle case where username is not found
+    if (!username) {
+        res.status(401).send('Unauthorized');
+        return;
+    }
+
     res.sendFile(path.join(__dirname, '../public', 'home.html'));
 });
 
@@ -67,115 +81,102 @@ app.get('/', (req, res) => {
 //---------------------------------------------------------------------------
 
 app.post('/login', (req, res) => {
+    const name = req.body.name;
+    const usr = req.body.usr;
+    const pwd = req.body.pwd;
 
-    var name = req.body.name;
-    var usr = req.body.usr;
-    var pwd = req.body.pwd;
+    if (name) {
+        // vars for registration queries
+        const sqlQueryRegister = "INSERT INTO users (name, username, password) VALUES (?, ?, ?)";
+        const values = [name, usr, pwd];
 
-    if(name) {
-        var sql_query_register = "INSERT INTO users (name, username, password) VALUES ('" + name + "', '" + usr + "', '" + pwd + "');"
-
-        con.query(sql_query_register, function (err, result, fields) { // execute the SQL string
-            if (err)
-                res.send("Illegal Query" + err);                  // SQL error
+        // send query
+        con.query(sqlQueryRegister, values, (err, result) => {
+            if (err) {
+                console.error('Error registering user:', err);
+                res.status(500).send('Internal Server Error');
+            } 
             else {
-                        console.log(sql_query_register);          // send query results to the console
-                        res.redirect("http://localhost:3000/home?usr=" + usr);   // redirect to home
-                }
-        });
-    }
-
-    else {
-        var sql_query_login = "SELECT username FROM users WHERE username='" + usr + "' AND password='" + pwd + "';"
-
-        con.query(sql_query_login, function (err, result, fields) { // execute the SQL string
-            if (err)
-                res.send("Illegal Query" + err);                  // SQL error
-            else if (result[0]) {
-                console.log(sql_query_login);                     // send query results to the console
-                res.redirect("http://localhost:3000/home?usr=" + usr);   // redirect to home
-            }
-            else 
-                res.status(401).json({ message: "Username or password is incorrect. Please try again, or create an account" }) //no account
+                console.log('User registered successfully.');
                 
+                // store user information in a cookie or session
+                res.cookie('username', usr); 
+                
+                // redirect back home 
+                res.redirect(`http://localhost:3000/home`);
+            }
+        });
+    } 
+    else {
+        // vars for login query
+        const sqlQueryLogin = "SELECT username FROM users WHERE username=? AND password=?";
+        const values = [usr, pwd];
+
+        // send login query
+        con.query(sqlQueryLogin, values, (err, result) => {
+            if (err) {
+                console.error('Error logging in:', err);
+                res.status(500).send('Internal Server Error');
+            } 
+            else if (result[0]) {
+                console.log('User logged in successfully.');
+                
+                // store user information in a cookie or session
+                res.cookie('username', usr);
+
+                // redirect back to home
+                res.redirect(`http://localhost:3000/home?usr=${usr}`);
+            } 
+            else {
+                // send error message
+                res.status(401).json({ message: "Username or password is incorrect. Please try again, or create an account" });
+            }
         });
     }
 });
+
 
 //---------------------------------------------------------------------------
 
 app.post('/home', (req, res) => {
+    
+    // extract data from the form submission
+    const username = req.cookies.username; 
+    const city = req.body.city;
+    const country = req.body.country;
+    const departureDate = req.body.departureDate;
+    const returnDate = req.body.returnDate;
+    const notes = req.body.notes;
 
-    var username = req.query.usr;
-    var city = req.body.city;
-    var country = req.body.country;
-    var start = req.body.deparetureDate;
-    var end = req.body.returnDate;
-    var notes = req.body.notes;
-
-    var city_id;
-    var visit_number;
-
-    var sql_query_cityid = "SELECT city_id FROM cities WHERE username='" + username + "' AND city_name='" + city + "';"
-    var sql_query_cmax = "SELECT MAX(city_id) AS max FROM cities WHERE username='" + username + "';"
-    var sql_query_cinput = "INSERT INTO cities (username, city_id, city_name, country) VALUES ('" + username + "', '" + city_id + "', '" + city + "', '" + country + "');"
-
-    var sql_query_vmax = "SELECT MAX(visit_number) AS max FROM visits WHERE username='" + username + "' AND city_id='" + city_id + "';"
-    var sql_query_vinput = "INSERT INTO visits (username, visit_number, city_id, start_date, end_date, notes) VALUES ('" + username + "', '" + visit_number + "', '" + city_id + "', '" + start + "', '" + end + "', '" + notes + "');"
-
-    con.query(sql_query_cityid, function (err, result, fields) { // execute the SQL string
-        if (err)
-            res.send("Illegal Query" + err);                  // SQL error
-        else {
-            console.log(sql_query_cityid);                     // send query results to the console
-            city_id = result[0];                //retreive city id
-            }
-    });
-
-    //if city is not in database
-    if(!city_id) {
-        con.query(sql_query_cmax, function (err, result, fields) { // execute the SQL string
-            if (err)
-                res.send("Illegal Query" + err);                  // SQL error
-            else {
-                console.log(sql_query_cmax);                     // send query results to the console                          
-                if(result[0])                                    //get new city id
-                    city_id = result[0].max + 1;
-                else
-                    city_id = 1;
-                }
-        });
-        //create new tuple
-        con.query(sql_query_cinput, function (err, result, fields) { // execute the SQL string
-            if (err)
-                res.send("Illegal Query" + err);                  // SQL error
-            else 
-                console.log(sql_query_cinput);                     // send query results to the console
-        });
+    // validate that required fields are not null or empty
+    if (!city || !country || !departureDate || !returnDate || !notes) {
+        return res.status(400).send('Invalid form data. Please fill in all required fields.');
     }
-    else
-        city_id = city_id.city_id;
 
-    con.query(sql_query_vmax, function (err, result, fields) { // execute the SQL string
-        if (err)
-            res.send("Illegal Query" + err);                  // SQL error
-        else {
-            console.log(sql_query_vmax);                     // send query results to the console
-            var vmax = result[0];                             //get new visit number
-            if(vmax)
-                visit_number = vmax.max + 1;
-            else
-                visit_number = 1;
-            }
-    });
-    //create new tuple
-    con.query(sql_query_vinput, function (err, result, fields) { // execute the SQL string
-        if (err)
-            res.send("Illegal Query" + err);                  // SQL error
-        else {
-            console.log(sql_query_vinput);                     // send query results to the console
-            }
+    // Insert the form data into the database
+
+    // var sql_query_cityid = "SELECT city_id FROM cities WHERE username='" + username + "' AND city_name='" + city + "';"
+    // var sql_query_cmax = "SELECT MAX(city_id) AS max FROM cities WHERE username='" + username + "';"
+    // var sql_query_cinput = "INSERT INTO cities (username, city_id, city_name, country) VALUES ('" + username + "', '" + city_id + "', '" + city + "', '" + country + "');"
+
+    // var sql_query_vmax = "SELECT MAX(visit_number) AS max FROM visits WHERE username='" + username + "' AND city_id='" + city_id + "';"
+    // var sql_query_vinput = "INSERT INTO visits (username, visit_number, city_id, start_date, end_date, notes) VALUES ('" + username + "', '" + visit_number + "', '" + city_id + "', '" + start + "', '" + end + "', '" + notes + "');"
+
+    const sqlQuery = `INSERT INTO visits (username, city, country, depart_date, return_date, notes) VALUES (?, ?, ?, ?, ?, ?)`;
+                    
+    const values = [username, city, country, departureDate, returnDate, notes]; 
+
+    con.query(sqlQuery, values, (err, result) => {
+        if (err) {
+            console.error('Error inserting data into the database:', err);
+            res.status(500).send('Internal Server Error');
+        } else {
+            console.log('Data inserted into the database successfully.');
+            // redirect the user back to the home page
+            res.redirect(`http://localhost:3000/home?usr=${username}`);
+        }
     });
 });
+
 
 //app.get('/home', (req, res) => {});
