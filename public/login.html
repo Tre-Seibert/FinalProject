@@ -30,7 +30,7 @@
             <main class="px-3">
                 <!-- We need to add error handling for client side using js -->
                 <!-- Login Form -->
-                <form name="login" action="http://localhost:3000/login" method="post">
+                <form name="login" action="http://localhost:3000/login" method="post" onsubmit="return validateLogin()">
                     <h3 class="mb-3">Welcome Back!</h3>
                     <div class="mb-3 row justify-content-center">
                         <div class="col-sm-4">
@@ -48,7 +48,7 @@
                 <hr class="my-4">
             
                 <!-- Sign Up Form -->
-                <form name="register" action="http://localhost:3000/login" method="post">
+                <form name="register" action="http://localhost:3000/login" method="post" onsubmit="return validateSignup()">
                     <h3 class="mb-3">New to WanderLog?</h3>
                     <div class="mb-3 row justify-content-center">
                         <div class="col-sm-4">
@@ -75,6 +75,8 @@
             </footer>
         </div>
 
+        <!-- Scripts - * Load Boostrap libraries last * -->
+        <script src="scripts/login.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     </body>
 </html>
