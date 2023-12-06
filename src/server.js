@@ -7,6 +7,7 @@ app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });
 
+
 // Cookie parser for storing creds
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
@@ -206,6 +207,41 @@ app.get('/visited-countries', (req, res) => {
         } else {
             const visitedCountries = result.map(row => row.country);
             res.json({ visitedCountries });
+        }
+    });
+});
+
+// Handles GET requests for user visits to a specific country
+app.get('/user-visits', (req, res) => {
+    const username = req.query.usr;
+    const country = req.query.country;
+
+    // not enough parms to fulfill request
+    if (!username || !country) {
+        // display error
+        res.status(400).json({ error: 'Invalid request parameters' });
+        return;
+    }
+
+    // query the database to get user visits to the specified country
+    const sqlQuery = 'SELECT city, depart_date, return_date, notes FROM visits WHERE username = ? AND country = ?';
+
+    // send query
+    con.query(sqlQuery, [username, country], (err, result) => {
+        if (err) {
+            // log errors
+            console.error('Error fetching user visits:', err);
+            res.status(500).json({ error: 'Internal Server Error' });
+        } 
+        else {
+            // build the json response with necessary fields
+            const userVisits = result.map(row => ({
+                city: row.city,
+                depart_date: row.depart_date,
+                return_date: row.return_date,
+                notes: row.notes,
+            }));
+            res.json({ visits: userVisits });
         }
     });
 });

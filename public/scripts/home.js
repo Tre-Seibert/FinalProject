@@ -48,46 +48,79 @@ function closeForm() {
 
 // Function to display country modal
 function displayCountryModal(countryId, countryName) {
-    // static for now... get trip information here from mysql
-    // dynamically get a list of cities and their associated information
-    let countryInfo = {
-        name: 'United States',
-        capital: 'Washington, D.C.',
-        population: '331 million',
-        attractions: ['Statue of Liberty', 'Grand Canyon', 'Disney World'],
-    };
-    
+    // fetch user visits to the selected country
+    fetchUserVisits(username, countryName)
+        .then(visits => {
+            // update modal content with user's visits information
+            let modalTitle = document.getElementById('countryModalLabel');
+            let modalBody = document.getElementById('countryInfo');
 
-    // update modal content with country information
-    let modalTitle = document.getElementById('countryModalLabel');
-    let modalBody = document.getElementById('countryInfo');
+            // populate the modal
+            modalTitle.innerText = `${username}'s Trips to ${countryName} at a Glance`;
 
-    // populate the modal
-    modalTitle.innerText = `${username}'s Trips to ${countryName} at a Glance`;
-    modalBody.innerHTML = `
-        <p>Capital: ${countryInfo.capital}</p>
-        <p>Population: ${countryInfo.population}</p>
-    `;
-    // display the modal
-    let countryModal = new bootstrap.Modal(document.getElementById('countryModal'));
-    countryModal.show();
+            if (visits.length > 0) {
+                const visitsList = visits.map(visit => {
+                    // format the date strings
+                    const formattedDepartDate = new Date(visit.depart_date).toLocaleDateString();
+                    const formattedReturnDate = new Date(visit.return_date).toLocaleDateString();
+                    
+                    // populate the modal
+                    return `<li class="mb-3" href="#visitDetails${visit.city}" role="button" aria-expanded="false" aria-controls="visitDetails${visit.city}">
+                        <b>${visit.city}, ${formattedDepartDate} - ${formattedReturnDate}</b><br>
+                        ${visit.notes}
+                        
+                        <div class="collapse" id="visitDetails${visit.city}">
+                            <div class="card card-body">
+                                <p>Notes:</p>
+                                <p>${visit.notes}</p>
+                            </div>
+                        </div>
+                    </li>`;
+                }).join(''); // join the html
+
+                // update modal body
+                modalBody.innerHTML = `
+                    <p><u>Visits</u></p>
+                    <ol>${visitsList}</ol>
+                `;
+            } 
+            else {
+                // return no visits recorded if not visited.
+                modalBody.innerHTML = '<p>No visits recorded for this country.</p>';
+            }
+
+            // Display the modal
+            let countryModal = new bootstrap.Modal(document.getElementById('countryModal'));
+            countryModal.show();
+        })
+        .catch(error => {
+            // catch errors
+            console.error('Error fetching user visits:', error);
+        });
 }
+
+
+
 
 // Function to fetch visited countries from the server
 function fetchVisitedCountries() {
+    // send get request
     fetch('/visited-countries')
-        .then(response => {
+        .then(response => { // wait for reponse
             if (!response.ok) {
+                // throw error if no response
                 throw new Error('Failed to fetch visited countries');
             }
             return response.json();
         })
         .then(data => {
+            // update vars
             visitedCountries = data.visitedCountries;
             console.log(visitedCountries)
             updateVisitedCountries();
         })
         .catch(error => {
+            // catch error
             console.error('Error:', error);
         });
 }
@@ -112,8 +145,27 @@ function updateVisitedCountries() {
         });
     } 
     else {
+        // log no svg available
         console.warn("SVG Document not available");
     }
+}
+
+// Function to fetch user visits to a specific country
+function fetchUserVisits(username, country) {
+    return fetch(`/user-visits?usr=${username}&country=${country}`)
+        .then(response => { // wait for reponse
+            if (!response.ok) {
+                // throw error if no reponse
+                throw new Error('Failed to fetch user visits');
+            }
+            return response.json();
+        })
+        .then(data => data.visits)
+        .catch(error => {
+            // catch and throw errors
+            console.error('Error:', error);
+            throw error;
+        });
 }
 
 // *******************************

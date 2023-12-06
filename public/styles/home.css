@@ -38,7 +38,14 @@
   color: black;
 }
 
+/* Style to center addLocationBtn */
 .centered {
   display: block;
   margin: 0 auto;
+}
+
+/* Style to remove numbers in ordered list and adjusts bootstrap default padding */
+ol {
+  list-style-type: none;
+  padding-right: 2rem;
 }
