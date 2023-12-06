@@ -2,6 +2,36 @@
 //   FUNCTIONS
 // ******************
 
+// function to validate login input (client side validates form data)
+async function validateLogin(event) {
+    event.preventDefault();
+
+    var username = document.getElementById('loginUsername').value;
+    var password = document.getElementById('loginPassword').value;
+
+    const response = await fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `usr=${username}&pwd=${password}`,
+    });
+
+    if (response.ok) {
+        // manually submit the form
+        event.target.submit();
+    } 
+    else {
+        // display an alert with the error message
+        const data = await response.json();
+        alert(data.message || 'An error occurred.');
+    }
+}
+
+
+
+
+
 // Function to validate sign up input (client side validates form data)
 function validateSignup() {
 

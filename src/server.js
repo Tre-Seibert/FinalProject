@@ -97,7 +97,8 @@ app.post('/login', (req, res) => {
                 res.redirect("http://localhost:3000/home?usr=" + usr);   // redirect to home
             }
             else 
-                res.send("No Account");                //no account
+                res.status(401).json({ message: "Username or password is incorrect. Please try again, or create an account" }) //no account
+                
         });
     }
 });
