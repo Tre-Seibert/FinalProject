@@ -257,7 +257,7 @@ fetch('/statistics')
         span.innerText = countries.substring(1,countries.length-1);
         // Update the number of days
         var span = document.getElementById('dayNum');
-        var days = JSON.stringify(data.statistics[2])
+        var days = JSON.stringify(Math.round(data.statistics[2]))
         span.innerText = days.substring(1,days.length-1);
         // Update the average triplength
         var span = document.getElementById('avgDay');
