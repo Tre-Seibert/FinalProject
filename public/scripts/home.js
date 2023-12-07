@@ -9,6 +9,15 @@ let visitedCountries = [];
 //      FUNCTIONS
 // ************************
 
+//functions to log out of session
+function logout() {
+    deleteCookie(username);
+    window.location.href = '/login.html';
+}
+function deleteCookie(name) {
+    document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/';
+}
+
 // Function to toggle new experience form on click
 function toggleForm() {
     // get the form element by its ID
