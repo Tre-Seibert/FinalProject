@@ -72,7 +72,7 @@ function displayCountryModal(countryId, countryName) {
                             <div class="card card-body">
                                 <p>Notes:</p>
                                 <p>${visit.notes}</p>
-                                <button class="btn btn-dark mt-2 mb-2 centered " onclick="deleteVisit(${visit.Id})">Delete</button>
+                                <button class="btn btn-dark mt-2 mb-2 centered " onclick="deleteVisit(${visit.visit_id})">Delete</button>
                             </div>
                         </div>
                     </li>`;
@@ -99,7 +99,18 @@ function displayCountryModal(countryId, countryName) {
         });
 }
 
-
+//function to delete a visit
+function deleteVisit(visit_id) {
+    fetch('/delete', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'data=' + visit_id,
+    });
+    //reload to update the page
+    location.reload();
+}
 
 
 // Function to fetch visited countries from the server
@@ -222,3 +233,42 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+// *******************************
+//   WANDER STATISTICS FUNCTIONS
+// *******************************
+
+//fetch user statistics information
+fetch('/statistics')
+    .then(response => { // wait for reponse
+        if (!response.ok) {
+            // throw error if no reponse
+            throw new Error('Failed to fetch user statistics');
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Update the number of cities
+        var span = document.getElementById('cityNum');
+        var cities = JSON.stringify(data.statistics[0])
+        span.innerText = cities.substring(1,cities.length-1);
+        // Update the number of countries
+        var span = document.getElementById('countryNum');
+        var countries = JSON.stringify(data.statistics[1])
+        span.innerText = countries.substring(1,countries.length-1);
+        // Update the number of days
+        var span = document.getElementById('dayNum');
+        var days = JSON.stringify(data.statistics[2])
+        span.innerText = days.substring(1,days.length-1);
+        // Update the average triplength
+        var span = document.getElementById('avgDay');
+        var avg = JSON.stringify(Math.round(data.statistics[3]))
+        span.innerText = avg.substring(1,avg.length-1);
+        // Update name
+        var span = document.getElementById('showName');
+        var name = JSON.stringify(data.statistics[4])
+        span.innerText = name.substring(1,name.length-1);
+    })
+    .catch(error => {
+        // catch error
+        console.error('Error:', error);
+    });

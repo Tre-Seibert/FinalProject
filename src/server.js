@@ -19,28 +19,27 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // This sql connection works for joe. Joe use this when working
 
 //*** set up mysql connections
-//  var mysql = require('mysql');
+  var mysql = require('mysql');
 
-
-//  var con = mysql.createConnection({
-//      host: "localhost",
-//      user: "root",
-//      password: "blubbins",  // use your own MySQL root password
-//      database: "wanderlog"
-//    });
+  var con = mysql.createConnection({
+      host: "localhost",
+      user: "root",
+      password: "blubbins",  // use your own MySQL root password
+      database: "wanderlog"
+    });
 
 
 // This sql connection works for Tre. Tre use this when working
 
-var mysql = require('mysql2');
+//var mysql = require('mysql2');
 
-var con = mysql.createConnection({
- host: "localhost",
-port: "3306",
- user: "root",
- password: "Alexemma1",
- database: "WanderLog"
-});
+//var con = mysql.createConnection({
+// host: "localhost",
+// port: "3306",
+// user: "root",
+// password: "Alexemma1",
+// database: "WanderLog"
+//});
 
 //*** connect to the database
 con.connect(function(err) {
@@ -157,14 +156,6 @@ app.post('/home', (req, res) => {
     }
 
     // Insert the form data into the database
-
-    // var sql_query_cityid = "SELECT city_id FROM cities WHERE username='" + username + "' AND city_name='" + city + "';"
-    // var sql_query_cmax = "SELECT MAX(city_id) AS max FROM cities WHERE username='" + username + "';"
-    // var sql_query_cinput = "INSERT INTO cities (username, city_id, city_name, country) VALUES ('" + username + "', '" + city_id + "', '" + city + "', '" + country + "');"
-
-    // var sql_query_vmax = "SELECT MAX(visit_number) AS max FROM visits WHERE username='" + username + "' AND city_id='" + city_id + "';"
-    // var sql_query_vinput = "INSERT INTO visits (username, visit_number, city_id, start_date, end_date, notes) VALUES ('" + username + "', '" + visit_number + "', '" + city_id + "', '" + start + "', '" + end + "', '" + notes + "');"
-
     const sqlQuery = `INSERT INTO visits (username, city, country, depart_date, return_date, notes) VALUES (?, ?, ?, ?, ?, ?)`;
                     
     const values = [username, city, country, departureDate, returnDate, notes]; 
@@ -180,9 +171,6 @@ app.post('/home', (req, res) => {
         }
     });
 });
-
-
-//app.get('/home', (req, res) => {});
 
 //---------------------------------------------------------------------------
 // Hanldes get during world.csg loading
@@ -224,7 +212,7 @@ app.get('/user-visits', (req, res) => {
     }
 
     // query the database to get user visits to the specified country
-    const sqlQuery = 'SELECT city, depart_date, return_date, notes FROM visits WHERE username = ? AND country = ?';
+    const sqlQuery = 'SELECT visit_id, city, depart_date, return_date, notes FROM visits WHERE username = ? AND country = ?';
 
     // send query
     con.query(sqlQuery, [username, country], (err, result) => {
@@ -236,12 +224,55 @@ app.get('/user-visits', (req, res) => {
         else {
             // build the json response with necessary fields
             const userVisits = result.map(row => ({
+                visit_id: row.visit_id,
                 city: row.city,
                 depart_date: row.depart_date,
                 return_date: row.return_date,
                 notes: row.notes,
             }));
             res.json({ visits: userVisits });
+        }
+    });
+});
+
+//handles deleting a visit
+app.post('/delete', (req, res) => {
+    const username = req.cookies.username;
+    const visit_id = req.body.data;
+
+    // SQL query to delete specified visit
+    const sqlQuery = 'DELETE FROM visits WHERE visit_id = ?';
+
+    // Execute the query
+    con.query(sqlQuery, [visit_id], (err, result) => {
+        if (err) {
+            // log errors
+            console.error('Error deleting visit:', err);
+            res.status(500).json({ error: 'Internal Server Error' });
+        } 
+        else {
+            console.log('Data deleted successfully.');
+        }
+    });
+});
+
+
+//handles GET requests for wander statistics
+app.get('/statistics', (req, res) => {
+    const username = req.cookies.username;
+
+    const sqlQuery = 'SELECT statistics FROM (SELECT COUNT(DISTINCT city) AS statistics, 1 AS count FROM visits WHERE username = ? UNION SELECT COUNT(DISTINCT country), 2 FROM visits WHERE username = ? UNION SELECT SUM(DATEDIFF(return_date, depart_date)), 3 FROM visits WHERE username = ? UNION SELECT AVG(DATEDIFF(return_date, depart_date)), 4 FROM visits WHERE username = ? UNION SELECT name, 5 FROM users WHERE username = ?) AS subquery;';
+
+    con.query(sqlQuery, [username,username,username,username,username], (err, result) => {
+        if (err) {
+            // log errors
+            console.error('Error fetching user visits:', err);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+        else {
+            // build the json response with necessary fields
+            const userStatistics = result.map(row => row.statistics);
+            res.json({ statistics: userStatistics });
         }
     });
 });
