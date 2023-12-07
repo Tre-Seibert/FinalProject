@@ -51,15 +51,13 @@ function displayCountryModal(countryId, countryName) {
     // fetch user visits to the selected country
     fetchUserVisits(username, countryName)
         .then(visits => {
+            
             // update modal content with user's visits information
             let modalTitle = document.getElementById('countryModalLabel');
             let modalBody = document.getElementById('countryInfo');
             
-            // capitalize the first letter of the username and convert the rest to lowercase
-            const formattedUsername = username.charAt(0).toUpperCase() + username.slice(1).toLowerCase();
-            
             // populate the modal
-            modalTitle.innerText = `${formattedUsername}'s Trips to ${countryName} at a Glance`;
+            modalTitle.innerText = `Your Trips to ${countryName} at a Glance`;
 
             if (visits.length > 0) {
                 const visitsList = visits.map(visit => {
