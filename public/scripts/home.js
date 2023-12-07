@@ -71,7 +71,10 @@ function displayCountryModal(countryId, countryName) {
                         <div id="visitDetails${visit.city}">
                             <div class="card card-body">
                                 <p>Notes:</p>
-                                <p>${visit.notes}</p>
+                                <div id="contentContainer">
+                                    <p id="content">${visit.notes}</p>
+                                </div>
+                                <button class="btn btn-dark mt-2 mb-2 centered " id="editButton" onclick="editNotes(${visit.visit_id})">Edit Notes</button>
                                 <button class="btn btn-dark mt-2 mb-2 centered " onclick="deleteVisit(${visit.visit_id})">Delete</button>
                             </div>
                         </div>
@@ -99,14 +102,58 @@ function displayCountryModal(countryId, countryName) {
         });
 }
 
+//function to edit notes
+function editNotes(visit_id) {
+    var contentContainer = document.getElementById("contentContainer");
+    var notes = document.getElementById("content"); 
+    var editButton = document.getElementById("editButton");
+
+    if (notes.tagName === "P") {
+        // Switch to input field
+        var inputField = document.createElement("input");
+        inputField.type = "text";
+        inputField.value = notes.innerHTML;
+        inputField.id = "content";
+
+        contentContainer.replaceChild(inputField, notes);
+        editButton.textContent = "Save Changes";
+    }
+    else {
+        // Switch back to paragraph
+        var inputField = document.getElementById("content");
+        var newNotes = document.createElement("p");
+        newNotes.id = "content";
+        newNotes.innerHTML = inputField.value;
+
+        contentContainer.replaceChild(newNotes, inputField);
+        editButton.textContent = "Edit Notes";
+
+        //update database
+        const formData = new URLSearchParams();
+        formData.append('visit_id', visit_id);
+        formData.append('notes', newNotes.innerHTML);
+        fetch('/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: formData.toString(),
+        });
+    }
+}
+
 //function to delete a visit
 function deleteVisit(visit_id) {
+
+    const formData = new URLSearchParams();
+    formData.append('data', visit_id);
+    
     fetch('/delete', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: 'data=' + visit_id,
+        body: formData.toString(),
     });
     //reload to update the page
     location.reload();

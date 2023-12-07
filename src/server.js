@@ -235,9 +235,29 @@ app.get('/user-visits', (req, res) => {
     });
 });
 
+//handles updating a visit's notes
+app.post('/update', (req, res) => {
+    const visit_id = req.body.visit_id;
+    const notes = req.body.notes
+
+    // SQL query to delete specified visit
+    const sqlQuery = 'UPDATE visits SET notes = ? WHERE visit_id = ?';
+
+    // Execute the query
+    con.query(sqlQuery, [notes, visit_id], (err, result) => {
+        if (err) {
+            // log errors
+            console.error('Error deleting visit:', err);
+            res.status(500).json({ error: 'Internal Server Error' });
+        } 
+        else {
+            console.log('Data updated successfully.');
+        }
+    });
+});
+
 //handles deleting a visit
 app.post('/delete', (req, res) => {
-    const username = req.cookies.username;
     const visit_id = req.body.data;
 
     // SQL query to delete specified visit
