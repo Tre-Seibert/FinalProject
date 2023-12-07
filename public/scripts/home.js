@@ -54,9 +54,12 @@ function displayCountryModal(countryId, countryName) {
             // update modal content with user's visits information
             let modalTitle = document.getElementById('countryModalLabel');
             let modalBody = document.getElementById('countryInfo');
-
+            
+            // capitalize the first letter of the username and convert the rest to lowercase
+            const formattedUsername = username.charAt(0).toUpperCase() + username.slice(1).toLowerCase();
+            
             // populate the modal
-            modalTitle.innerText = `${username}'s Trips to ${countryName} at a Glance`;
+            modalTitle.innerText = `${formattedUsername}'s Trips to ${countryName} at a Glance`;
 
             if (visits.length > 0) {
                 const visitsList = visits.map(visit => {
@@ -66,13 +69,12 @@ function displayCountryModal(countryId, countryName) {
                     
                     // populate the modal
                     return `<li class="mb-3" href="#visitDetails${visit.city}" role="button" aria-expanded="false" aria-controls="visitDetails${visit.city}">
-                        <b>${visit.city}, ${formattedDepartDate} - ${formattedReturnDate}</b><br>
-                        ${visit.notes}
-                        
-                        <div class="collapse" id="visitDetails${visit.city}">
+                        <h5><b>${visit.city}, ${formattedDepartDate} - ${formattedReturnDate}</b><br></h5>
+                        <div id="visitDetails${visit.city}">
                             <div class="card card-body">
                                 <p>Notes:</p>
                                 <p>${visit.notes}</p>
+                                <button class="btn btn-dark mt-2 mb-2 centered " onclick="deleteVisit(${visit.Id})">Delete</button>
                             </div>
                         </div>
                     </li>`;
@@ -80,7 +82,7 @@ function displayCountryModal(countryId, countryName) {
 
                 // update modal body
                 modalBody.innerHTML = `
-                    <p><u>Visits</u></p>
+                    <h4><p><u>Visits</u></p></h4>
                     <ol>${visitsList}</ol>
                 `;
             } 
@@ -180,9 +182,12 @@ document.addEventListener('DOMContentLoaded', function () {
     username = urlParams.get('usr');
     const usernameElement = document.getElementById('username');
 
+    // capitalize the first letter of the username and convert the rest to lowercase
+    const formattedUsername = username.charAt(0).toUpperCase() + username.slice(1).toLowerCase();
+
     // dynamically add the username where needed on home.html
     if (usernameElement) {
-        usernameElement.innerText = username;
+        usernameElement.innerText = formattedUsername;
     }
 });
 
