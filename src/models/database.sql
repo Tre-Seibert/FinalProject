@@ -16,5 +16,6 @@ CREATE TABLE visits (
     depart_date DATE,
     return_date DATE,
     notes TEXT,
+    CONSTRAINT check_dates_order CHECK (depart_date <= return_date),
     FOREIGN KEY (username) REFERENCES users(username)
 );
