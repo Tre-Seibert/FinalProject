@@ -249,7 +249,7 @@ fetch('/statistics')
     .then(data => {
         // Update the number of cities
         var span = document.getElementById('cityNum');
-        var cities = JSON.stringify(data.statistics[0])
+        var cities = JSON.stringify(data.statistics[0]);
         span.innerText = cities.substring(1,cities.length-1);
         // Update the number of countries
         var span = document.getElementById('countryNum');
@@ -257,15 +257,15 @@ fetch('/statistics')
         span.innerText = countries.substring(1,countries.length-1);
         // Update the number of days
         var span = document.getElementById('dayNum');
-        var days = JSON.stringify(Math.round(data.statistics[2]))
-        span.innerText = days.substring(1,days.length-1);
+        var days = JSON.stringify(Math.round(data.statistics[2]));
+        span.innerText = days;//.substring(1,days.length-1);
         // Update the average triplength
         var span = document.getElementById('avgDay');
-        var avg = JSON.stringify(Math.round(data.statistics[3]))
-        span.innerText = avg.substring(1,avg.length-1);
+        var avg = JSON.stringify(Math.round(data.statistics[3]));
+        span.innerText = avg;//.substring(1,avg.length-1);
         // Update name
         var span = document.getElementById('showName');
-        var name = JSON.stringify(data.statistics[4])
+        var name = JSON.stringify(data.statistics[4]);
         span.innerText = name.substring(1,name.length-1);
     })
     .catch(error => {
