@@ -71,10 +71,10 @@ function displayCountryModal(countryId, countryName) {
                         <div id="visitDetails${visit.city}">
                             <div class="card card-body">
                                 <p>Notes:</p>
-                                <div id="contentContainer">
-                                    <p id="content">${visit.notes}</p>
+                                <div id="contentContainer_${visit.visit_id}">
+                                    <p id="content_${visit.visit_id}">${visit.notes}</p>
                                 </div>
-                                <button class="btn btn-dark mt-2 mb-2 centered " id="editButton" onclick="editNotes(${visit.visit_id})">Edit Notes</button>
+                                <button class="btn btn-dark mt-2 mb-2 centered " id="editButton_${visit.visit_id}" onclick="editNotes(${visit.visit_id})">Edit Notes</button>
                                 <button class="btn btn-dark mt-2 mb-2 centered " onclick="deleteVisit(${visit.visit_id})">Delete</button>
                             </div>
                         </div>
@@ -104,25 +104,26 @@ function displayCountryModal(countryId, countryName) {
 
 //function to edit notes
 function editNotes(visit_id) {
-    var contentContainer = document.getElementById("contentContainer");
-    var notes = document.getElementById("content"); 
-    var editButton = document.getElementById("editButton");
+    var contentContainer = document.getElementById("contentContainer_" + visit_id);
+    var notes = document.getElementById("content_" + visit_id); 
+    var editButton = document.getElementById("editButton_" + visit_id);
 
     if (notes.tagName === "P") {
         // Switch to input field
-        var inputField = document.createElement("input");
-        inputField.type = "text";
+        var inputField = document.createElement("textarea");
         inputField.value = notes.innerHTML;
-        inputField.id = "content";
+        inputField.id = "content_" + visit_id;
+        inputField.rows = "3"; 
+        inputField.cols = "45";
 
         contentContainer.replaceChild(inputField, notes);
         editButton.textContent = "Save Changes";
     }
     else {
         // Switch back to paragraph
-        var inputField = document.getElementById("content");
+        var inputField = document.getElementById("content_" + visit_id);
         var newNotes = document.createElement("p");
-        newNotes.id = "content";
+        newNotes.id = "content_" + visit_id;
         newNotes.innerHTML = inputField.value;
 
         contentContainer.replaceChild(newNotes, inputField);
