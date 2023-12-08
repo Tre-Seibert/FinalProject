@@ -9,12 +9,39 @@ let visitedCountries = [];
 //      FUNCTIONS
 // ************************
 
-//functions to log out of session
+// Functions to log out of session
 function logout() {
+    // delete cookie
     deleteCookie(username);
-    window.location.href = '/login.html';
+
+    // fetch logout request
+    fetch('/logout', {
+        method: 'POST',
+    })
+    .then(response => {
+        if (response.ok) {
+            // handle the success case
+            console.log('Logout request sent successfully');
+            // redirect after successful logout
+            window.location.href = '/login.html';
+        } else {
+            // handle the case where logout was not successful
+            console.error('Logout request failed:', response.status);
+            // redirect to the login page even on failure
+            window.location.href = '/login.html';
+        }
+    })
+    .catch(error => {
+        // handle errors
+        console.error('Error sending logout request:', error);
+        // redirect to the login page on error
+        window.location.href = '/login.html';
+    });
 }
+
+// funciton to deleteCookie
 function deleteCookie(name) {
+    // make the cookie exist in the past, to be deleted
     document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/';
 }
 
@@ -174,7 +201,6 @@ function deleteVisit(visit_id) {
     location.reload();
 }
 
-
 // Function to fetch visited countries from the server
 function fetchVisitedCountries() {
     // send get request
@@ -256,7 +282,6 @@ function validateDates(event) {
         }
     }
 }
-
 // Add an event listener to the form to validate dates before submission
 document.forms["Entry"].addEventListener("submit", validateDates);
 

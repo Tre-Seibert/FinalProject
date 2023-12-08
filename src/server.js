@@ -1,4 +1,7 @@
 const express = require('express');
+const session = require('express-session');
+const crypto = require('crypto');
+const bcrypt = require('bcrypt');
 const path = require('path');
 const app = express();
 const port = 3000;
@@ -15,6 +18,24 @@ app.use(cookieParser());
 //*** create form parser
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// generate a random secret key for session
+const secretKey = crypto.randomBytes(32).toString('hex');
+
+// use the express-session middleware for session mgmt.
+app.use(session({
+    secret: secretKey,
+    resave: false,
+    saveUninitialized: true,
+    //  session expires after 5 minutes of inactivity
+    cookie: { maxAge: 300000 }
+}));
+
+app.use((req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    next();
+});
+
 
 // This sql connection works for joe. Joe use this when working
 
@@ -59,9 +80,15 @@ app.get('/home', (req, res) => {
     // get username from cookies
     const username = req.cookies.username;
 
+    // Check if the user is logged in (session contains username)
+    if (!req.session.username) {
+        res.status(401).send('Unauthorized');
+        return;
+    }
+
     // handle case where username is not found
     if (!username) {
-        res.status(401).send('Unauthorized');
+        res.redirect('/login');
         return;
     }
 
@@ -73,6 +100,22 @@ app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, '../public', 'login.html'));
 });
 
+// Serve logout route
+app.post('/logout', (req, res) => {
+    // destroy the session
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Error destroying session:', err);
+            res.status(500).send('Internal Server Error');
+        } else {
+            console.log('Logout successful');
+            // respond with a success message or status
+            res.status(200).send('Logout successful');
+        }
+    });
+});
+
+
 // Serve landing.html for the root route
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../public', 'landing.html'));
@@ -81,54 +124,67 @@ app.get('/', (req, res) => {
 //---------------------------------------------------------------------------
 // Handles post during login
 //---------------------------------------------------------------------------
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
     const name = req.body.name;
     const usr = req.body.usr;
     const pwd = req.body.pwd;
 
     if (name) {
         // vars for registration queries
+        const hashedPassword = await bcrypt.hash(pwd, 10); // 10 is the number of salt rounds
+
         const sqlQueryRegister = "INSERT INTO users (name, username, password) VALUES (?, ?, ?)";
-        const values = [name, usr, pwd];
+        const values = [name, usr, hashedPassword];
 
         // send query
         con.query(sqlQueryRegister, values, (err, result) => {
             if (err) {
                 console.error('Error registering user:', err);
                 res.status(500).send('Internal Server Error');
-            } 
-            else {
+            } else {
                 console.log('User registered successfully.');
-                
+
                 // store user information in a cookie or session
-                res.cookie('username', usr); 
-                
-                // redirect back home 
+                res.cookie('username', usr);
+                req.session.username = usr;
+
+                // redirect back home
                 res.redirect(`http://localhost:3000/home?usr=${usr}`);
             }
         });
-    } 
-    else {
+    } else {
         // vars for login query
-        const sqlQueryLogin = "SELECT username FROM users WHERE username=? AND password=?";
-        const values = [usr, pwd];
+        const sqlQueryLogin = "SELECT username, password FROM users WHERE username=?";
+        const values = [usr];
 
         // send login query
-        con.query(sqlQueryLogin, values, (err, result) => {
+        con.query(sqlQueryLogin, values, async (err, result) => {
             if (err) {
                 console.error('Error logging in:', err);
                 res.status(500).send('Internal Server Error');
             } 
             else if (result[0]) {
-                console.log('User logged in successfully.');
-                
-                // store user information in a cookie or session
-                res.cookie('username', usr);
+                const hashedPassword = result[0].password;
 
-                // redirect back to home
-                res.redirect(`http://localhost:3000/home?usr=${usr}`);
-            } 
-            else {
+                // compare hashed password with the provided password
+                const passwordMatch = await bcrypt.compare(pwd, hashedPassword);
+
+                if (passwordMatch) {
+                    console.log('User logged in successfully.');
+                    // store user information in a cookie
+                    res.cookie('username', usr);
+
+                    // store user information in session for session tracking
+                    req.session.username = usr;
+
+                    // redirect back to home
+                    res.redirect(`http://localhost:3000/home?usr=${usr}`);
+                } 
+                else {
+                    // send error message
+                    res.status(401).json({ message: "Username or password is incorrect. Please try again, or create an account" });
+                }
+            } else {
                 // send error message
                 res.status(401).json({ message: "Username or password is incorrect. Please try again, or create an account" });
             }
