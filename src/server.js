@@ -296,3 +296,27 @@ app.get('/statistics', (req, res) => {
         }
     });
 });
+
+//handles GET requests for username checking on sign up
+// Handles GET requests for checking username availability
+app.get('/check-username', (req, res) => {
+    const username = req.query.usr;
+
+    // query the database to check if the username exists
+    const sqlQuery = 'SELECT COUNT(*) AS count FROM users WHERE username = ?';
+
+    con.query(sqlQuery, [username], (err, result) => {
+        // check for backend errors
+        if (err) {
+            // send errors
+            console.error('Error checking username availability:', err);
+            res.status(500).json({ error: 'Internal Server Error' });
+        } 
+        else {
+            // send response
+            const count = result[0].count;
+            const available = count === 0;
+            res.json({ available });
+        }
+    });
+});

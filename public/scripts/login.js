@@ -9,22 +9,26 @@ async function validateLogin(event) {
     var username = document.getElementById('loginUsername').value;
     var password = document.getElementById('loginPassword').value;
 
-    const response = await fetch('http://localhost:3000/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `usr=${username}&pwd=${password}`,
-    });
+    try {
+        const response = await fetch('http://localhost:3000/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `usr=${username}&pwd=${password}`,
+        });
 
-    if (response.ok) {
-        // manually submit the form
-        event.target.submit();
-    } 
-    else {
-        // display an alert with the error message
-        const data = await response.json();
-        alert(data.message || 'An error occurred.');
+        if (response.ok) {
+            // manually submit the form
+            event.target.submit();
+        } else {
+            // display an alert with the error message
+            const data = await response.json();
+            alert(data.message || 'An error occurred.');
+        }
+    } catch (error) {
+        console.error('An error occurred during login:', error);
+        alert('An error occurred during login.');
     }
 }
 
@@ -33,7 +37,11 @@ async function validateLogin(event) {
 
 
 // Function to validate sign up input (client side validates form data)
-function validateSignup() {
+async function validateSignup(event) {
+
+    // prevent the default form submission
+    event.preventDefault();
+
 
     // USERNAME REQUIREMENTS:
 
@@ -67,10 +75,11 @@ function validateSignup() {
     // PASSWORD REQUIREMENTS:
 
     // validate password length
-    if (password.length < 8 ) {
-        alert('Password must be at least 8 characters.');
+    if (password.length < 8 || password.length > 20) {
+        alert('Password must be between 8 and 20 characters.');
         return false;
     }
+
 
     //  complexity requirement for password
     if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]+$/.test(password)) {
@@ -78,15 +87,44 @@ function validateSignup() {
         return false;
     }
 
+    // check username availability
+    const isUsernameAvailable = await checkUsernameAvailability(username);
+
+    if (!isUsernameAvailable) {
+        alert('Username is already taken. Please choose a different username.');
+        return false; // Prevent form submission if username is not available
+    }
+
+    // manually submit the form (prevents redirection to json response)
+    document.forms['register'].submit();
+
     // allow form submission
     return true;
 
 }
 
-// function to check username availability 
-function checkUsernameAvailability(username) {
-    // sanatize
+// function to check username availability
+async function checkUsernameAvailability(username) {
+    // sanitize
     username = username.toLowerCase();
 
-    return true; 
+
+    try {
+        const response = await fetch(`http://localhost:3000/check-username?usr=${username}`);
+        
+        if (response.ok) {
+            // wait for response and return error
+            const data = await response.json();
+            return data.available;
+        } 
+        else {
+            // Handle error by assuming username is unavailable
+            console.error('Error checking username availability');
+            return false;
+        }
+    } 
+    catch (error) {
+        console.error('An error occurred during the username availability check:', error);
+        return false;
+    }
 }
