@@ -44,6 +44,17 @@
   margin: 0 auto;
 }
 
+.center-modal-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Add margin to separate buttons */
+.center-modal-buttons button, .center-modal-buttons svg {
+  margin-right: 25px;
+}
+
 /* Style to remove numbers in ordered list and adjusts bootstrap default padding */
 ol {
   list-style-type: none;
@@ -59,3 +70,4 @@ ol {
   height: 37px;
   font-size: 12px;
 }
+

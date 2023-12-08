@@ -61,12 +61,11 @@
                 
                 <!-- Entry Form -->
                 <div class="city-entry-form mt-5 " id="cityEntryForm">
-
+                    <!-- Close button (initially hidden) -->
+                    <button id="closeFormBtn" class="btn btn-sm btn-secondary fw-bold mt-3" style="display: none;" onclick="closeForm()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                     <form name="Entry" action="/home" method="post">
-                        <!-- Close button (initially hidden) -->
-                        <button id="closeFormBtn" class="btn btn-sm btn-secondary fw-bold mt-3" style="display: none;" onclick="closeForm()">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
                         <div class="mb-3 ">
                             <label for="city" class="form-label">City:</label>
                             <input type="text" class="form-control" id="city" name="city" placeholder="Paris" required>
