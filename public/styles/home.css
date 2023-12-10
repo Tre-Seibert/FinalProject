@@ -52,7 +52,8 @@
 
 /* Add margin to separate buttons */
 .center-modal-buttons button, .center-modal-buttons svg {
-  margin-right: 25px;
+  margin-right: 15px;
+  margin-left: 15px;
 }
 
 /* Style to remove numbers in ordered list and adjusts bootstrap default padding */
