@@ -27,8 +27,8 @@ app.use(session({
     secret: secretKey,
     resave: false,
     saveUninitialized: true,
-    //  session expires after 5 minutes of inactivity
-    cookie: { maxAge: 300000 }
+    //  session expires after 30 minutes of inactivity
+    cookie: { maxAge: 1800000 }
 }));
 
 app.use((req, res, next) => {
@@ -82,7 +82,7 @@ app.get('/home', (req, res) => {
 
     // Check if the user is logged in (session contains username)
     if (!req.session.username) {
-        res.status(401).send('Unauthorized');
+        res.redirect('/login');
         return;
     }
 

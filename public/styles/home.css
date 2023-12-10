@@ -61,13 +61,8 @@ ol {
   padding-right: 2rem;
 }
 
-/* Style for logout button*/
-#logoutButton {
-  position: absolute;
-  top: 1px;
-  right: 20px;
-  width: 70px;
-  height: 37px;
-  font-size: 12px;
+/* Style to keep the edit notes region inside the container*/
+textarea {
+  width: 100%; 
+  box-sizing: border-box;
 }
-
