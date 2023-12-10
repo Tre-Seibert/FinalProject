@@ -2,7 +2,7 @@ CREATE DATABASE wanderlog;
 
 
 CREATE TABLE users (
-	name VARCHAR (20),
+	name VARCHAR (50),
 	username VARCHAR (20) NOT NULL,
     password VARCHAR (255),
     PRIMARY KEY(username)
