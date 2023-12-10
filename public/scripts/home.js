@@ -150,7 +150,6 @@ function displayCountryModal(countryId, countryName) {
 function editNotes(visit_id) {
     var contentContainer = document.getElementById("contentContainer_" + visit_id);
     var notes = document.getElementById("content_" + visit_id); 
-    var editButton = document.getElementById("editButton_" + visit_id);
 
     if (notes.tagName === "P") {
         // Switch to input field
