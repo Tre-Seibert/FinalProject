@@ -39,28 +39,28 @@ app.use((req, res, next) => {
 
 // This sql connection works for joe. Joe use this when working
 
-//*** set up mysql connections
-   var mysql = require('mysql');
+// //*** set up mysql connections
+//    var mysql = require('mysql');
 
-   var con = mysql.createConnection({
-       host: "localhost",
-       user: "root",
-       password: "blubbins", 
-       database: "wanderlog"
-     });
+//    var con = mysql.createConnection({
+//        host: "localhost",
+//        user: "root",
+//        password: "blubbins", 
+//        database: "wanderlog"
+//      });
 
 
 // This sql connection works for Tre. Tre use this when working
 
-//var mysql = require('mysql2');
+var mysql = require('mysql2');
 
-//var con = mysql.createConnection({
-//host: "localhost",
-//port: "3306",
-//user: "root",
-//password: "Alexemma1",
-//database: "WanderLog"
-//});
+var con = mysql.createConnection({
+host: "localhost",
+port: "3306",
+user: "root",
+password: "Alexemma1",
+database: "WanderLog"
+});
 
 //*** connect to the database
 con.connect(function(err) {

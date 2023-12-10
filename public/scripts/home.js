@@ -159,9 +159,8 @@ function editNotes(visit_id) {
         inputField.id = "content_" + visit_id;
         inputField.rows = "3"; 
         inputField.cols = "45";
-
+        
         contentContainer.replaceChild(inputField, notes);
-        editButton.textContent = "Save Changes";
     }
     else {
         // Switch back to paragraph
@@ -171,7 +170,6 @@ function editNotes(visit_id) {
         newNotes.innerHTML = inputField.value;
 
         contentContainer.replaceChild(newNotes, inputField);
-        editButton.textContent = "Edit Notes";
 
         //update database
         const formData = new URLSearchParams();
@@ -530,7 +528,8 @@ function validateCountry(event) {
                     'Zambia',
                     'Zimbabwe'];
 
-    if (!isInList(countryInput, countryList)) {
+    // Check if the entered country is in the list
+    if (!countryList.includes(countryInput.value)) {
         alert("Invalid country name. Please input a valid country.");
         event.preventDefault(); // Prevent the form from submitting
     }
