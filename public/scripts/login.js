@@ -2,14 +2,17 @@
 //   FUNCTIONS
 // ******************
 
-// function to validate login input (client side validates form data)
+// Function to validate login input (client side validates form data)
 async function validateLogin(event) {
+    // prevent the form from submitting
     event.preventDefault();
 
+    // get username and password
     var username = document.getElementById('loginUsername').value;
     var password = document.getElementById('loginPassword').value;
 
     try {
+        // await server login response
         const response = await fetch('http://localhost:3000/login', {
             method: 'POST',
             headers: {
@@ -31,10 +34,6 @@ async function validateLogin(event) {
         alert('An error occurred during login.');
     }
 }
-
-
-
-
 
 // Function to validate sign up input (client side validates form data)
 async function validateSignup(event) {
@@ -103,13 +102,13 @@ async function validateSignup(event) {
 
 }
 
-// function to check username availability
+// Function to check username availability
 async function checkUsernameAvailability(username) {
     // sanitize
     username = username.toLowerCase();
 
-
     try {
+        // wait for /check-username response
         const response = await fetch(`http://localhost:3000/check-username?usr=${username}`);
         
         if (response.ok) {

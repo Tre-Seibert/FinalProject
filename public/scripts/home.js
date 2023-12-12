@@ -39,7 +39,7 @@ function logout() {
     });
 }
 
-// funciton to deleteCookie
+// Function to deleteCookie
 function deleteCookie(name) {
     // make the cookie exist in the past, to be deleted
     document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/';
@@ -61,7 +61,7 @@ function toggleForm() {
         document.getElementById("addLocationBtn").style.display = 'none';
         document.getElementById("closeFormBtn").style.display = 'block';
     } 
-    // Form hidden
+    // form hidden
     else {
         // if visible then hide the form
         form.style.display = 'none';
@@ -83,7 +83,7 @@ function closeForm() {
 }
 
 // Function to display country modal
-function displayCountryModal(countryId, countryName) {
+function displayCountryModal(countryName) {
     // fetch user visits to the selected country
     fetchUserVisits(username, countryName)
         .then(visits => {
@@ -151,7 +151,7 @@ function editNotes(visit_id) {
     var notes = document.getElementById("content_" + visit_id); 
 
     if (notes.tagName === "P") {
-        // Switch to input field
+        // switch to input field
         var inputField = document.createElement("textarea");
         inputField.value = notes.innerHTML;
         inputField.id = "content_" + visit_id;
@@ -161,7 +161,7 @@ function editNotes(visit_id) {
         contentContainer.replaceChild(inputField, notes);
     }
     else {
-        // Switch back to paragraph
+        // switch back to paragraph
         var inputField = document.getElementById("content_" + visit_id);
         var newNotes = document.createElement("p");
         newNotes.id = "content_" + visit_id;
@@ -169,7 +169,7 @@ function editNotes(visit_id) {
 
         contentContainer.replaceChild(newNotes, inputField);
 
-        //update database
+        // update database
         const formData = new URLSearchParams();
         formData.append('visit_id', visit_id);
         formData.append('notes', newNotes.innerHTML);
@@ -186,9 +186,11 @@ function editNotes(visit_id) {
 //function to delete a visit
 function deleteVisit(visit_id) {
 
+    // get the form data
     const formData = new URLSearchParams();
     formData.append('data', visit_id);
     
+    // call /delete route to handle deleting on backend
     fetch('/delete', {
         method: 'POST',
         headers: {
@@ -196,6 +198,7 @@ function deleteVisit(visit_id) {
         },
         body: formData.toString(),
     });
+    
     //reload to update the page
     location.reload();
 }
@@ -228,6 +231,7 @@ function updateVisitedCountries() {
     const worldMapObject = document.getElementById("world-map");
     const svgDoc = worldMapObject.contentDocument;
 
+    // check if svg exist
     if (svgDoc) {
         visitedCountries.forEach(code => {
             
@@ -250,6 +254,8 @@ function updateVisitedCountries() {
 
 // Function to fetch user visits to a specific country
 function fetchUserVisits(username, country) {
+   
+    // return values from /user-vists call
     return fetch(`/user-visits?usr=${username}&country=${country}`)
         .then(response => { // wait for reponse
             if (!response.ok) {
@@ -269,6 +275,7 @@ function fetchUserVisits(username, country) {
 // Function to validate country before submitting the form
 function validateCountry(event) {
     var countryInput = document.getElementById("country");
+    // list of countries based on title attributes of all paths in svg
     var countryList = ['Andorra',
                     'United Arab Emirates',
                     'Afghanistan',
@@ -526,10 +533,11 @@ function validateCountry(event) {
                     'Zambia',
                     'Zimbabwe'];
 
-    // Check if the entered country is in the list
+    // check if the entered country is in the list
     if (!countryList.includes(countryInput.value)) {
         alert("Invalid country name. Please input a valid country.");
-        event.preventDefault(); // Prevent the form from submitting
+        // prevent the form from submitting
+        event.preventDefault(); 
     }
 }
 // Add an event listener to the form to validate country before submission
@@ -537,10 +545,13 @@ document.forms["Entry"].addEventListener("submit", validateCountry);
 
 // Function to validate dates before submitting the form
 function validateDates(event) {
+    // get depart and return dates
     var departureDateInput = document.getElementById("departureDate");
     var returnDateInput = document.getElementById("returnDate");
 
+    // check to make sure they both have a value
     if (departureDateInput.value && returnDateInput.value) {
+        // get get values as a js date
         var departureDate = new Date(departureDateInput.value);
         var returnDate = new Date(returnDateInput.value);
 
@@ -574,7 +585,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-// Function to load SVG document and fetch visited countries
+// Function to wait for SVG document to load and call fetchVisitedCountries
 document.getElementById('world-map').addEventListener('load', function () {
     console.log("SVG LOADED");
     fetchVisitedCountries();
@@ -583,13 +594,16 @@ document.getElementById('world-map').addEventListener('load', function () {
 // Function to get ID and Name of country clicked and display modal if visited
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('world-map').addEventListener('load', function () {
+        // get svg by id
         let svgDoc = document.getElementById('world-map').contentDocument;
+        // get all paths inside svg file
         let paths = svgDoc.querySelectorAll('path');
 
+        // loop throguh paths 
         paths.forEach(function (path) {
             path.addEventListener('click', function () {
                 
-                // get path from 
+                // get countryid and name from path title
                 let clickedCountryId = path.id;
                 let clickedCountryName = path.getAttribute('title');
                 
@@ -622,23 +636,23 @@ fetch('/statistics')
         return response.json();
     })
     .then(data => {
-        // Update the number of cities
+        // update the number of cities
         var span = document.getElementById('cityNum');
         var cities = JSON.stringify(data.statistics[0]);
         span.innerText = cities.substring(1,cities.length-1);
-        // Update the number of countries
+        // update the number of countries
         var span = document.getElementById('countryNum');
         var countries = JSON.stringify(data.statistics[1])
         span.innerText = countries.substring(1,countries.length-1);
-        // Update the number of days
+        // update the number of days
         var span = document.getElementById('dayNum');
         var days = JSON.stringify(Math.round(data.statistics[2]));
         span.innerText = days;//.substring(1,days.length-1);
-        // Update the average triplength
+        // update the average triplength
         var span = document.getElementById('avgDay');
         var avg = JSON.stringify(Math.round(data.statistics[3]));
         span.innerText = avg;//.substring(1,avg.length-1);
-        // Update name
+        // update name
         var span = document.getElementById('showName');
         var name = JSON.stringify(data.statistics[4]);
         span.innerText = name.substring(1,name.length-1);

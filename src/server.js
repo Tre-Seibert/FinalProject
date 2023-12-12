@@ -6,16 +6,17 @@ const path = require('path');
 const app = express();
 const port = 3000;
 
+// listen on port 3000
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });
 
 
-// Cookie parser for storing creds
+// cookie parser for storing creds
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
-//*** create form parser
+// create form parser
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -30,7 +31,6 @@ app.use(session({
     //  session expires after 30 minutes of inactivity
     cookie: { maxAge: 1800000 }
 }));
-
 app.use((req, res, next) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
     next();
@@ -52,7 +52,7 @@ app.use((req, res, next) => {
 
 // This sql connection works for Tre. Tre use this when working
 
-var mysql = require('mysql2');
+var mysql = require('mysql2'); // this sql library must be used to work on tres mac
 
 var con = mysql.createConnection({
 host: "localhost",
@@ -62,7 +62,7 @@ password: "Alexemma1",
 database: "WanderLog"
 });
 
-//*** connect to the database
+// connect to the database
 con.connect(function(err) {
   if (err)
       throw err;
@@ -125,14 +125,17 @@ app.get('/', (req, res) => {
 // Handles post during login
 //---------------------------------------------------------------------------
 app.post('/login', async (req, res) => {
+    // get the name, username, password from call
     const name = req.body.name;
     const usr = req.body.usr;
     const pwd = req.body.pwd;
 
+    // check if name is present
     if (name) {
-        // vars for registration queries
-        const hashedPassword = await bcrypt.hash(pwd, 10); // 10 is the number of salt rounds
+        // vars for registration queries. 10 is num of salt rounds
+        const hashedPassword = await bcrypt.hash(pwd, 10);
 
+        // construct query
         const sqlQueryRegister = "INSERT INTO users (name, username, password) VALUES (?, ?, ?)";
         const values = [name, usr, hashedPassword];
 
@@ -169,6 +172,7 @@ app.post('/login', async (req, res) => {
                 // compare hashed password with the provided password
                 const passwordMatch = await bcrypt.compare(pwd, hashedPassword);
 
+                // if passwords match
                 if (passwordMatch) {
                     console.log('User logged in successfully.');
                     // store user information in a cookie
@@ -211,11 +215,11 @@ app.post('/home', (req, res) => {
         return res.status(400).send('Invalid form data. Please fill in all required fields.');
     }
 
-    // Insert the form data into the database
+    // construct query
     const sqlQuery = `INSERT INTO visits (username, city, country, depart_date, return_date, notes) VALUES (?, ?, ?, ?, ?, ?)`;
-
     const values = [username, city, country, departureDate, returnDate, notes]; 
-
+    
+    // Insert the form data into the database
     con.query(sqlQuery, values, (err, result) => {
         if (err) {
             console.error('Error inserting data into the database:', err);
@@ -231,24 +235,28 @@ app.post('/home', (req, res) => {
 //---------------------------------------------------------------------------
 // Hanldes get during world.csg loading
 //---------------------------------------------------------------------------
-// Add this route to handle fetching visited countries
+// Handles fetching visited countries
 app.get('/visited-countries', (req, res) => {
     // Get the username from cookies
     const username = req.cookies.username;
 
+    // if theres no username, user needs to log back in
     if (!username) {
         res.status(401).json({ error: 'Unauthorized' });
         return;
     }
 
-    // Query the database to get visited countries for the user
+    // construct query for the database to get visited countries for the user
     const sqlQuery = 'SELECT DISTINCT country FROM visits WHERE username = ?';
 
+    // send query
     con.query(sqlQuery, [username], (err, result) => {
         if (err) {
             console.error('Error fetching visited countries:', err);
             res.status(500).json({ error: 'Internal Server Error' });
-        } else {
+        } 
+        else {
+            // send visited countries back as json response
             const visitedCountries = result.map(row => row.country);
             res.json({ visitedCountries });
         }
@@ -257,6 +265,8 @@ app.get('/visited-countries', (req, res) => {
 
 // Handles GET requests for user visits to a specific country
 app.get('/user-visits', (req, res) => {
+    
+    // get username and country from call
     const username = req.query.usr;
     const country = req.query.country;
 
@@ -286,6 +296,7 @@ app.get('/user-visits', (req, res) => {
                 return_date: row.return_date,
                 notes: row.notes,
             }));
+            // send a json response
             res.json({ visits: userVisits });
         }
     });
@@ -293,13 +304,14 @@ app.get('/user-visits', (req, res) => {
 
 //handles updating a visit's notes
 app.post('/update', (req, res) => {
+    // get visit id and notes from call
     const visit_id = req.body.visit_id;
     const notes = req.body.notes
 
-    // SQL query to delete specified visit
+    // construct SQL query to delete specified visit
     const sqlQuery = 'UPDATE visits SET notes = ? WHERE visit_id = ?';
 
-    // Execute the query
+    // execute the query
     con.query(sqlQuery, [notes, visit_id], (err, result) => {
         if (err) {
             // log errors
@@ -314,12 +326,14 @@ app.post('/update', (req, res) => {
 
 //handles deleting a visit
 app.post('/delete', (req, res) => {
+    
+    // get visit_id from call
     const visit_id = req.body.data;
 
-    // SQL query to delete specified visit
+    // construct SQL query to delete specified visit
     const sqlQuery = 'DELETE FROM visits WHERE visit_id = ?';
 
-    // Execute the query
+    // execute the query
     con.query(sqlQuery, [visit_id], (err, result) => {
         if (err) {
             // log errors
@@ -332,13 +346,16 @@ app.post('/delete', (req, res) => {
     });
 });
 
-
 //handles GET requests for wander statistics
 app.get('/statistics', (req, res) => {
+   
+    // get username from call
     const username = req.cookies.username;
 
+    // construct query
     const sqlQuery = 'SELECT statistics FROM (SELECT COUNT(DISTINCT city) AS statistics, 1 AS count FROM visits WHERE username = ? UNION SELECT COUNT(DISTINCT country), 2 FROM visits WHERE username = ? UNION SELECT SUM(DATEDIFF(return_date, depart_date)), 3 FROM visits WHERE username = ? UNION SELECT AVG(DATEDIFF(return_date, depart_date)), 4 FROM visits WHERE username = ? UNION SELECT name, 5 FROM users WHERE username = ?) AS subquery;';
 
+    // execute query
     con.query(sqlQuery, [username,username,username,username,username], (err, result) => {
         if (err) {
             // log errors
@@ -353,14 +370,16 @@ app.get('/statistics', (req, res) => {
     });
 });
 
-//handles GET requests for username checking on sign up
-// Handles GET requests for checking username availability
+// Handles GET requests for checking username availability on signup
 app.get('/check-username', (req, res) => {
+   
+    // get username from call
     const username = req.query.usr;
 
-    // query the database to check if the username exists
+    // construct query for the database to check if the username exists
     const sqlQuery = 'SELECT COUNT(*) AS count FROM users WHERE username = ?';
 
+    // execute query
     con.query(sqlQuery, [username], (err, result) => {
         // check for backend errors
         if (err) {
