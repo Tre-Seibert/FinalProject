@@ -2,16 +2,24 @@ const express = require('express');
 const session = require('express-session');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
+const https = require('https');
 const path = require('path');
+const fs = require('fs');
 const app = express();
 const port = 3000;
 
+// Load SSL certificate files
+const privateKey = fs.readFileSync('/etc/nginx/ssl/key1.key', 'utf8');
+const certificate = fs.readFileSync('/etc/nginx/ssl/cert1.crt', 'utf8');
+const credentials = { key: privateKey, cert: certificate };
+
+// Create an HTTPS server with your Express app
+const httpsServer = https.createServer(credentials, app);
+
 // listen on port 3000
-app.listen(port, '0.0.0.0', () => {
-    console.log(`Server is running at http://192.168.1.164:${port}`);
+httpsServer.listen(port, '0.0.0.0', () => {
+    console.log(`Server is running at https://192.168.1.164:${port}`);
 });
-
-
 // cookie parser for storing creds
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
@@ -152,7 +160,7 @@ app.post('/login', async (req, res) => {
                 req.session.username = usr;
 
                 // redirect back home
-                res.redirect(`http://192.168.1.164:3000/home?usr=${usr}`);
+                res.redirect(`https://wanderlog.treseibert.com/home?usr=${usr}`);
             }
         });
     } else {
@@ -182,7 +190,7 @@ app.post('/login', async (req, res) => {
                     req.session.username = usr;
 
                     // redirect back to home
-                    res.redirect(`http://192.168.1.164:3000/home?usr=${usr}`);
+                    res.redirect(`https://wanderlog.treseibert.com/home?usr=${usr}`);
                 } 
                 else {
                     // send error message
@@ -227,7 +235,7 @@ app.post('/home', (req, res) => {
         } else {
             console.log('Data inserted into the database successfully.');
             // redirect the user back to the home page
-            res.redirect(`http://192.168.1.164:3000/home?usr=${username}`);
+            res.redirect(`https://wanderlog.treseibert.com/home?usr=${username}`);
         }
     });
 });
