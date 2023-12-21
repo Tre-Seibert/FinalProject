@@ -13,14 +13,13 @@ async function validateLogin(event) {
 
     try {
         // await server login response
-        const response = await fetch('http://localhost:3000/login', {
+        const response = await fetch('https://wanderlog.treseibert.com/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: `usr=${username}&pwd=${password}`,
         });
-
         if (response.ok) {
             // manually submit the form
             event.target.submit();
@@ -109,7 +108,7 @@ async function checkUsernameAvailability(username) {
 
     try {
         // wait for /check-username response
-        const response = await fetch(`http://localhost:3000/check-username?usr=${username}`);
+        const response = await fetch(`https://wanderlog.treseibert.com/check-username?usr=${username}`);
         
         if (response.ok) {
             // wait for response and return error

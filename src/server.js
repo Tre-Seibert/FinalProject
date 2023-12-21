@@ -2,16 +2,24 @@ const express = require('express');
 const session = require('express-session');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
+const https = require('https');
 const path = require('path');
+const fs = require('fs');
 const app = express();
 const port = 3000;
 
+// Load SSL certificate files
+const privateKey = fs.readFileSync('/etc/nginx/ssl/key1.key', 'utf8');
+const certificate = fs.readFileSync('/etc/nginx/ssl/cert1.crt', 'utf8');
+const credentials = { key: privateKey, cert: certificate };
+
+// Create an HTTPS server with your Express app
+const httpsServer = https.createServer(credentials, app);
+
 // listen on port 3000
-app.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
+httpsServer.listen(port, '0.0.0.0', () => {
+    console.log(`Server is running at https://192.168.1.164:${port}`);
 });
-
-
 // cookie parser for storing creds
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
@@ -53,12 +61,13 @@ app.use((req, res, next) => {
 // This sql connection works for Tre. Tre use this when working
 
 var mysql = require('mysql2'); // this sql library must be used to work on tres mac
+const { Console } = require('console');
 
 var con = mysql.createConnection({
 host: "localhost",
 port: "3306",
 user: "root",
-password: "Alexemma1",
+password: "Alexemmatre1!",
 database: "WanderLog"
 });
 
@@ -152,7 +161,7 @@ app.post('/login', async (req, res) => {
                 req.session.username = usr;
 
                 // redirect back home
-                res.redirect(`http://localhost:3000/home?usr=${usr}`);
+                res.redirect(`https://wanderlog.treseibert.com/home?usr=${usr}`);
             }
         });
     } else {
@@ -182,7 +191,7 @@ app.post('/login', async (req, res) => {
                     req.session.username = usr;
 
                     // redirect back to home
-                    res.redirect(`http://localhost:3000/home?usr=${usr}`);
+                    res.redirect(`https://wanderlog.treseibert.com/home?usr=${usr}`);
                 } 
                 else {
                     // send error message
@@ -227,7 +236,7 @@ app.post('/home', (req, res) => {
         } else {
             console.log('Data inserted into the database successfully.');
             // redirect the user back to the home page
-            res.redirect(`http://localhost:3000/home?usr=${username}`);
+            res.redirect(`https://wanderlog.treseibert.com/home?usr=${username}`);
         }
     });
 });
@@ -265,10 +274,12 @@ app.get('/visited-countries', (req, res) => {
 
 // Handles GET requests for user visits to a specific country
 app.get('/user-visits', (req, res) => {
-    
     // get username and country from call
     const username = req.query.usr;
     const country = req.query.country;
+
+    console.log(username);
+    console.log(country)
 
     // not enough parms to fulfill request
     if (!username || !country) {
@@ -284,7 +295,7 @@ app.get('/user-visits', (req, res) => {
     con.query(sqlQuery, [username, country], (err, result) => {
         if (err) {
             // log errors
-            console.error('Error fetching user visits:', err);
+            console.log('Error fetching user visits:', err);
             res.status(500).json({ error: 'Internal Server Error' });
         } 
         else {
@@ -296,6 +307,7 @@ app.get('/user-visits', (req, res) => {
                 return_date: row.return_date,
                 notes: row.notes,
             }));
+            console.log(userVisits);
             // send a json response
             res.json({ visits: userVisits });
         }
