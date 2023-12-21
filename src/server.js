@@ -7,8 +7,8 @@ const app = express();
 const port = 3000;
 
 // listen on port 3000
-app.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
+app.listen(port, '0.0.0.0', () => {
+    console.log(`Server is running at http://192.168.1.164:${port}`);
 });
 
 
@@ -58,7 +58,7 @@ var con = mysql.createConnection({
 host: "localhost",
 port: "3306",
 user: "root",
-password: "Alexemma1",
+password: "Alexemmatre1!",
 database: "WanderLog"
 });
 
@@ -152,7 +152,7 @@ app.post('/login', async (req, res) => {
                 req.session.username = usr;
 
                 // redirect back home
-                res.redirect(`http://localhost:3000/home?usr=${usr}`);
+                res.redirect(`http://192.168.1.164:3000/home?usr=${usr}`);
             }
         });
     } else {
@@ -182,7 +182,7 @@ app.post('/login', async (req, res) => {
                     req.session.username = usr;
 
                     // redirect back to home
-                    res.redirect(`http://localhost:3000/home?usr=${usr}`);
+                    res.redirect(`http://192.168.1.164:3000/home?usr=${usr}`);
                 } 
                 else {
                     // send error message
@@ -227,7 +227,7 @@ app.post('/home', (req, res) => {
         } else {
             console.log('Data inserted into the database successfully.');
             // redirect the user back to the home page
-            res.redirect(`http://localhost:3000/home?usr=${username}`);
+            res.redirect(`http://192.168.1.164:3000/home?usr=${username}`);
         }
     });
 });
