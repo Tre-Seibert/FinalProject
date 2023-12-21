@@ -61,6 +61,7 @@ app.use((req, res, next) => {
 // This sql connection works for Tre. Tre use this when working
 
 var mysql = require('mysql2'); // this sql library must be used to work on tres mac
+const { Console } = require('console');
 
 var con = mysql.createConnection({
 host: "localhost",
@@ -273,10 +274,12 @@ app.get('/visited-countries', (req, res) => {
 
 // Handles GET requests for user visits to a specific country
 app.get('/user-visits', (req, res) => {
-    
     // get username and country from call
     const username = req.query.usr;
     const country = req.query.country;
+
+    console.log(username);
+    console.log(country)
 
     // not enough parms to fulfill request
     if (!username || !country) {
@@ -292,7 +295,7 @@ app.get('/user-visits', (req, res) => {
     con.query(sqlQuery, [username, country], (err, result) => {
         if (err) {
             // log errors
-            console.error('Error fetching user visits:', err);
+            console.log('Error fetching user visits:', err);
             res.status(500).json({ error: 'Internal Server Error' });
         } 
         else {
@@ -304,6 +307,7 @@ app.get('/user-visits', (req, res) => {
                 return_date: row.return_date,
                 notes: row.notes,
             }));
+            console.log(userVisits);
             // send a json response
             res.json({ visits: userVisits });
         }

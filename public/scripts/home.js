@@ -83,9 +83,9 @@ function closeForm() {
 }
 
 // Function to display country modal
-function displayCountryModal(countryName) {
+function displayCountryModal(clickedCountryId, clickedCountryName) {
     // fetch user visits to the selected country
-    fetchUserVisits(username, countryName)
+    fetchUserVisits(username, clickedCountryName)
         .then(visits => {
             
             // update modal content with user's visits information
@@ -93,7 +93,7 @@ function displayCountryModal(countryName) {
             let modalBody = document.getElementById('countryInfo');
             
             // populate the modal
-            modalTitle.innerText = `Your Trips to ${countryName} at a Glance`;
+            modalTitle.innerText = `Your Trips to ${clickedCountryName} at a Glance`;
 
             if (visits.length > 0) {
                 const visitsList = visits.map(visit => {
