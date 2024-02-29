@@ -63,13 +63,7 @@ app.use((req, res, next) => {
 var mysql = require('mysql2'); // this sql library must be used to work on tres mac
 const { Console } = require('console');
 
-var con = mysql.createConnection({
-host: "localhost",
-port: "3306",
-user: "root",
-password: "Alexemmatre1!",
-database: "WanderLog"
-});
+
 
 // connect to the database
 con.connect(function(err) {
