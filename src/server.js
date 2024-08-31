@@ -2,23 +2,18 @@ const express = require('express');
 const session = require('express-session');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
-const https = require('https');
+const http = require('http');
 const path = require('path');
 const fs = require('fs');
 const app = express();
-const port = 3000;
-
-// Load SSL certificate files
-const privateKey = fs.readFileSync('/etc/nginx/ssl/key1.key', 'utf8');
-const certificate = fs.readFileSync('/etc/nginx/ssl/cert1.crt', 'utf8');
-const credentials = { key: privateKey, cert: certificate };
+const port = 5000;
 
 // Create an HTTPS server with your Express app
-const httpsServer = https.createServer(credentials, app);
+const httpServer = http.createServer(app);
 
 // listen on port 3000
-httpsServer.listen(port, '0.0.0.0', () => {
-    console.log(`Server is running at https://192.168.1.164:${port}`);
+httpServer.listen(port, '0.0.0.0', () => {
+    console.log(`Server is running at https://127.0.0.1:${port}`);
 });
 // cookie parser for storing creds
 const cookieParser = require('cookie-parser');
